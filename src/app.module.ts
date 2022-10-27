@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ValidationModule } from './users/validation/validation.module';
 import { SessionModule } from './session/session.module';
 import getDataSourceConfig from './data-source.config';
+import { ProfileModule } from './profile/profile.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import getDataSourceConfig from './data-source.config';
     UsersModule,
     TypeOrmModule.forRoot(getDataSourceConfig()),
     SessionModule,
+    ProfileModule,
   ],
   controllers: [AppController],
   providers: [AppService],

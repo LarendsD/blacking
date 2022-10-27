@@ -1,6 +1,24 @@
 extends ./index.pug
 
 block header
-  h1.my-5 Профиль
+  h1.mb-3.mt-3= `${firstName} ${lastName} ${middleName}`
+  .container.text-center
+    .row
+      .col
+        h2 Общее:
+        h3= `Пол: ${gender}`
+        h3= `Город: ${liveInCity}`
+        h3= `Дата рождения: ${birtdayDate}`
+        h3= `Образование: [Education]`
+        button.btn.btn-primary.mt-5(type='button') Узнай обо мне больше!
+      .col 
+        img.rounded.mx-auto.d-block(src=avatar, alt="Здесь аватар!")
+      .col 
+        h2 Работа:
+        h3= `Направление: [directions]`
+        h3= `Фреймворки: [frameworks]`
+        h3= `Языки программирования: [programming languages]`
+        h3= `Опыт: [expirience]`
+        h3= `Базы данных: [databases]`
+        button.btn.btn-primary(type='button') Узнай о моей работе больше!
 block content 
-  h3 Тут должен быть профиль!

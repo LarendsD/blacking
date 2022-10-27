@@ -1,31 +1,18 @@
-import {
-  Controller,
-  Get,
-  Render,
-  UseGuards,
-  Request,
-  UseFilters,
-} from '@nestjs/common';
+import { Controller, Get, Render, UseGuards, UseFilters } from '@nestjs/common';
 import { AppService } from './app.service';
-import { JwtAuthGuard } from './session/jwt-auth.guard';
-import { UsersService } from './users/users.service';
-import { UnauthorizedExceptionFilter } from './exceptions/unauthorized-exception.filter';
 import { ForbiddenExceptionFilter } from './session/exceptions/forbidden-exception.filter';
 import { SessionGuard } from './session/guards/session.guard';
 
 @Controller()
 export class AppController {
-  constructor(
-    private readonly appService: AppService,
-    private usersService: UsersService,
-  ) {}
+  constructor(private readonly appService: AppService) {}
 
   @UseGuards(SessionGuard)
   @UseFilters(new ForbiddenExceptionFilter())
   @Get()
   @Render('welcome')
   getHello() {
-    return this.appService.getHello();
+    return this.appService.getWelcome();
   }
 
   @UseGuards(SessionGuard)
@@ -66,13 +53,5 @@ export class AppController {
   @Render('users/logIn')
   loginPage() {
     return this.appService.getLoginPage();
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @UseFilters(new UnauthorizedExceptionFilter())
-  @Get('profile')
-  @Render('logged/profile')
-  profilePage(@Request() req) {
-    return this.usersService.findByEmail(req.user.email);
   }
 }

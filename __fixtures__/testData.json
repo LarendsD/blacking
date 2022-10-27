@@ -1,0 +1,30 @@
+{
+    "users": {
+        "create": {
+            "firstName": "Garry",
+            "lastName": "Selestia",
+            "email": "garrySel@mail.ru",
+            "password": "GarryPass123",
+            "confirmPassword": "GarryPass123"
+        },
+        "read": {
+            "id": 1,
+            "firstName": "John",
+            "lastName": "Doe",
+            "email": "undefined@mail.ru"
+        },
+        "update": {
+            "firstName": "Josh",
+            "lastName": "Brainward",
+            "email": "garryIsSilent@yandex.ru"
+        },
+        "login": {
+            "email": "undefined@mail.ru",
+            "password": "NotFound404"
+        },
+        "sign": {
+            "id": 1,
+            "email": "undefined@mail.ru"
+        }
+    }
+}

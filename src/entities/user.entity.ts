@@ -25,19 +25,37 @@ export class Users {
   @Column()
   password: string;
 
-  @Column({ default: '' })
+  @Column({ nullable: true })
   avatar: string;
 
-  @Column({ default: '' })
+  @Column({ nullable: true })
   liveInCity: string;
 
-  @Column({ default: '' })
+  @Column({ nullable: true })
   birtdayDate: string;
 
-  @Column({ default: '' })
+  @Column({ nullable: true })
+  education: string;
+
+  @Column({ nullable: true })
+  directions: string;
+
+  @Column({ nullable: true })
+  frameworks: string;
+
+  @Column({ nullable: true })
+  programmingLanguages: string;
+
+  @Column({ nullable: true })
+  expirience: string;
+
+  @Column({ nullable: true })
+  databases: string;
+
+  @Column({ nullable: true })
   gender: string;
 
-  @Column({ default: '' })
+  @Column({ nullable: true })
   aboutMe: string;
 
   @Column({ default: '' })

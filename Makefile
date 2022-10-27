@@ -6,3 +6,6 @@ db-migrate:
 
 db-drop:
 	npm run typeorm -- migration:revert -d ./src/data-source.ts
+
+run-test:
+	npm run test:e2e

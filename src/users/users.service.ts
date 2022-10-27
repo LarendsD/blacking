@@ -12,7 +12,7 @@ export class UsersService {
     private usersRepository: Repository<Users>,
   ) {}
 
-  create({ password, firstName, lastName, email }: CreateUserDto) {
+  async create({ password, firstName, lastName, email }: CreateUserDto) {
     const user = new Users();
     user.firstName = firstName;
     user.lastName = lastName;
@@ -25,15 +25,16 @@ export class UsersService {
     return this.usersRepository.findOneBy({ email });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findById(id: number) {
+    return this.usersRepository.findOneBy({ id });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    await this.usersRepository.update(id, updateUserDto);
+    return this.usersRepository.findOneBy({ id });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number) {
+    return this.usersRepository.delete({ id });
   }
 }

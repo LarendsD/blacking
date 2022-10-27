@@ -1,7 +1,7 @@
 import { DataSourceOptions } from 'typeorm';
 import { config } from 'dotenv';
 import { Users } from './entities/user.entity';
-import { migrations1666008357637 } from './migrations/1666008357637-migrations';
+import { migrations1666883449641 } from './migrations/1666883449641-migrations';
 
 export default (): DataSourceOptions => {
   config();
@@ -16,7 +16,7 @@ export default (): DataSourceOptions => {
         url: process.env.DATABASE_URL,
         ssl: { rejectUnauthorized: false },
         entities: [`${__dirname}/entities/*.entity.{ts,js}`],
-        migrations: [migrations1666008357637],
+        migrations: [migrations1666883449641],
       };
     case 'test':
       return {
@@ -24,14 +24,14 @@ export default (): DataSourceOptions => {
         synchronize: true,
         database: ':memory:',
         entities: [Users],
-        migrations: [migrations1666008357637],
+        migrations: [migrations1666883449641],
       };
     default:
       return {
         type: 'sqlite',
         database: 'blacking.sqlite',
         entities: [Users],
-        migrations: [migrations1666008357637],
+        migrations: [migrations1666883449641],
       };
   }
 };

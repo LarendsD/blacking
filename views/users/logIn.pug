@@ -5,7 +5,7 @@ block header
 
 block content 
   main.container.float-md-center.mb-5
-    form(action='/session' method='post')
+    form(action='/login' method='post')
       if (message)
         .form-floating.mb-5.is-invalid
           input.form-control.form-control-lg.is-invalid(name='email' type='email' id='email' placeholder='Ваш Email' value=body.email)

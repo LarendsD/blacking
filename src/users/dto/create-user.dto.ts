@@ -1,5 +1,5 @@
 import { IsEmail, IsString, Length, Matches, Validate } from 'class-validator';
-import { registerMessage } from 'src/ru/messages';
+import { registerMessage } from '../../ru/messages';
 import { CheckEmail } from '../validation/compare-emails';
 import { ComparePasswords } from '../validation/compare-passwords';
 
