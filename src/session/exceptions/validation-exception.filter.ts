@@ -6,6 +6,7 @@ import {
   HttpException,
 } from '@nestjs/common';
 import { Response } from 'express';
+import { userMessage } from '../../ru/messages';
 
 @Catch(UnauthorizedException)
 export class UnauthorizedExceptionFilter implements ExceptionFilter {
@@ -16,7 +17,7 @@ export class UnauthorizedExceptionFilter implements ExceptionFilter {
     const status = exception.getStatus();
     response.status(status);
     response.render('users/logIn', {
-      message: 'Неверный логин или пароль!',
+      errs: userMessage.login,
       body,
     });
   }

@@ -15,4 +15,12 @@ export class ProfileController {
   profilePage(@Profile() user) {
     return this.usersService.findByEmail(user.email);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @UseFilters(new UnauthorizedExceptionFilter())
+  @Get('profile/edit')
+  @Render('logged/profileEdit')
+  profileEditPage(@Profile() user) {
+    return this.usersService.findById(user.id);
+  }
 }

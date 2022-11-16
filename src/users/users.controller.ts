@@ -8,6 +8,7 @@ import {
   Delete,
   UseFilters,
   Render,
+  Redirect,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -34,7 +35,9 @@ export class UsersController {
   }
 
   @Patch(':id')
+  @Redirect('/profile')
   update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
+    console.log(updateUserDto);
     return this.usersService.update(id, updateUserDto);
   }
 

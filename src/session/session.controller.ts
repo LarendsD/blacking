@@ -6,7 +6,6 @@ import {
   Session,
   UseFilters,
   Redirect,
-  Render,
 } from '@nestjs/common';
 import { UnauthorizedExceptionFilter } from './exceptions/validation-exception.filter';
 import { JwtAuthGuard } from './jwt-auth.guard';

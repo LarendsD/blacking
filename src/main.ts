@@ -4,8 +4,10 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { useContainer } from 'class-validator';
 import { join } from 'path';
 import { AppModule } from './app.module';
+import * as express from 'express';
 import getSessionConfig from './session/config/session.config';
 import redisServer from './session/config/redis-server.config';
+import * as methodOverride from 'method-override';
 
 declare const module: any;
 
@@ -15,6 +17,8 @@ async function bootstrap() {
   app.setViewEngine('pug');
   app.useGlobalPipes(new ValidationPipe());
   app.use(getSessionConfig());
+  app.use(express.static('public'));
+  app.use(methodOverride('_method'));
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   await redisServer();
   await app.listen(3000);

@@ -1,5 +1,6 @@
-export const registerMessage = {
+export const userMessage = {
   firstNameLength: 'firstName:Имя должно содержать от 2 до 30 символов!',
+  middleNameLength: 'middleName:Отчество должно содержать от 2 до 30 символов!',
   lastNameLength: 'lastName:Фамилия должна содержать от 2 до 30 символов!',
   emailInvalid: 'email:Email должен содержать почту! Например, example@mail.ru',
   emailLength: 'email:Email должен содержать от 5 до 50 символов!',
@@ -7,4 +8,8 @@ export const registerMessage = {
     'password:Пароль должен содержать хотя бы одну заглавную букву, одну прописную букву и одно число!',
   comparePasswords: 'confirmPassword:Пароли не совпадают!',
   emailExists: 'email:Email уже существует!',
+  login: {
+    email: ['Неверный логин или пароль'],
+    password: ['Неверный логин или пароль'],
+  },
 };

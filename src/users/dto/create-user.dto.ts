@@ -1,49 +1,49 @@
 import { IsEmail, IsString, Length, Matches, Validate } from 'class-validator';
-import { registerMessage } from '../../ru/messages';
+import { userMessage } from '../../ru/messages';
 import { CheckEmail } from '../validation/compare-emails';
 import { ComparePasswords } from '../validation/compare-passwords';
 
 export class CreateUserDto {
   @IsString()
   @Length(2, 30, {
-    message: registerMessage.firstNameLength,
+    message: userMessage.firstNameLength,
   })
   firstName: string;
 
   @IsString()
   @Length(2, 30, {
-    message: registerMessage.lastNameLength,
+    message: userMessage.lastNameLength,
   })
   lastName: string;
 
   @IsEmail(
     {},
     {
-      message: registerMessage.emailInvalid,
+      message: userMessage.emailInvalid,
     },
   )
   @IsString()
   @Validate(CheckEmail, {
-    message: registerMessage.emailExists,
+    message: userMessage.emailExists,
   })
   @Length(5, 50, {
-    message: registerMessage.emailLength,
+    message: userMessage.emailLength,
   })
   email: string;
 
   @Matches(/[0-9]/, {
-    message: registerMessage.passwordInvalid,
+    message: userMessage.passwordInvalid,
   })
   @Matches(/[a-z]/, {
-    message: registerMessage.passwordInvalid,
+    message: userMessage.passwordInvalid,
   })
   @Matches(/[A-Z]/, {
-    message: registerMessage.passwordInvalid,
+    message: userMessage.passwordInvalid,
   })
   password: string;
 
   @Validate(ComparePasswords, {
-    message: registerMessage.comparePasswords,
+    message: userMessage.comparePasswords,
   })
   confirmPassword: string;
 }

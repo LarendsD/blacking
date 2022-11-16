@@ -68,7 +68,7 @@ describe('Session Controller (e2e)', () => {
     await request(app.getHttpServer())
       .post('/login')
       .send(testData.login)
-      .expect(201);
+      .expect(302);
   });
 
   it('logout', async () => {

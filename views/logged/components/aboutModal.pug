@@ -1,0 +1,7 @@
+.modal.fade(id="about" tabindex="-1" aria-labelledby="aboutModal" aria-hidden="true")
+  .modal-dialog.modal-dialog-centered.modal-dialog-scrollable
+    .modal-content.text-bg-dark
+      .modal-header
+        h1.modal-title.fs-5(id="aboutModal") Обо мне
+        button.button.btn-close(data-bs-dismiss="modal" aria-label="Close")
+      .modal-body= `${aboutMe}`

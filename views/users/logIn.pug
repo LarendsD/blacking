@@ -6,19 +6,6 @@ block header
 block content 
   main.container.float-md-center.mb-5
     form(action='/login' method='post')
-      if (message)
-        .form-floating.mb-5.is-invalid
-          input.form-control.form-control-lg.is-invalid(name='email' type='email' id='email' placeholder='Ваш Email' value=body.email)
-          label(for='email') Email
-        .form-floating.mb-3.is-invalid
-          input.form-control.form-control-lg.is-invalid(name='password' type='password', id='password' placeholder='Ваш пароль')
-          label(for='password') Пароль
-        .invalid-feedback.mb-3= `${message}`
-      else
-        .form-floating.mb-5
-          input.form-control.form-control-lg(name= 'email' type='email', id='email' placeholder='Ваш Email')
-          label(for='email') Email
-        .form-floating.mb-5
-          input.form-control.form-control-lg(name='password' type='password', id='password' placeholder='Ваш пароль')
-          label(for='password') Пароль
+      +input('email', 'Email', 'Ваш Email', body, errs)(type='text')
+      +input('password', 'Пароль', 'Ваш пароль', {}, errs)(type='password')
       button.btn.btn-lg.btn-light(type='submit') Войти

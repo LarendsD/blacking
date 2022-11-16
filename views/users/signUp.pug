@@ -6,54 +6,9 @@ block header
 block content 
   main.container.float-md-center.mb-5
     form(action='/users' method='post')
-      if (errs && errs.firstName)
-        .form-floating.is-invalid
-          input.form-control.form-control-lg.is-invalid(type='text' name='firstName' id='firstName' placeholder='Ваше имя' value=body.firstName)
-          label(for='firstName') Имя
-        for err in errs.firstName
-          .invalid-feedback.mb-3= `${err}`
-      else 
-        .form-floating.mb-5
-          input.form-control.form-control-lg(type='text' name='firstName' id='firstName' placeholder='Ваше имя' value=body ? body.firstName : '') 
-          label(for='firstName') Имя
-      if (errs && errs.lastName)
-        .form-floating.is-invalid
-          input.form-control.form-control-lg.is-invalid(type='text' name='lastName' id='lastName' placeholder='Ваша фамилия' value=body.lastName)
-          label(for='lastName') Фамилия
-        for err in errs.lastName
-          .invalid-feedback.mb-3= `${err}`
-      else
-        .form-floating.mb-5
-          input.form-control.form-control-lg(type='text' name='lastName' id='lastName' placeholder='Ваша фамилия' value=body ? body.lastName : '')
-          label(for='lastName') Фамилия
-      if (errs && errs.email)
-        .form-floating.is-invalid
-          input.form-control.form-control-lg.is-invalid(type='text' name='email' id='email' placeholder='Ваш Email' value=body.email)
-          label(for='email') Email
-        for err in errs.email
-          .invalid-feedback.mb-3= `${err}`
-      else
-        .form-floating.mb-5
-          input.form-control.form-control-lg(type='text' name='email' id='email' placeholder='Ваш Email' value=body ? body.email : '')
-          label(for='email') Email
-      if (errs && errs.password)
-        .form-floating.is-invalid
-          input.form-control.form-control-lg.is-invalid(type='password' name='password' id='password' placeholder='Ваш Пароль' value=body.password)
-          label(for='password') Пароль
-        for err in errs.password
-          .invalid-feedback.mb-3= `${err}`
-      else
-        .form-floating.mb-5
-          input.form-control.form-control-lg(type='password' name='password' id='password' placeholder='Ваш пароль' value=body ? body.password : '')
-          label(for='password') Пароль
-      if (errs && errs.confirmPassword)
-        .form-floating.is-invalid
-          input.form-control.form-control-lg.is-invalid(type='password' name='confirmPassword' id='confirmPassword' placeholder='Подтвердите пароль' value=body.confirmPassword)
-          label(for='confirmPassword') Подтвердите пароль
-        for err in errs.confirmPassword
-          .invalid-feedback.mb-3= `${err}`
-      else
-        .form-floating.mb-5
-          input.form-control.form-control-lg(type='password' name='confirmPassword' id='confirmPassword' placeholder='Подтвертите пароль' value=body ? body.confirmPassword : '')
-          label(for='confirmPassword') Подтвертите пароль
+      +input('firstName', 'Имя', 'Ваше Имя', body,  errs)(type='text')
+      +input('lastName', 'Фамилия', 'Ваша Фамилия', body, errs)(type='text')
+      +input('email', 'Email', 'Ваш Email', body, errs)(type='text')
+      +input('password', 'Пароль', 'Ваш пароль', {}, errs)(type='password')
+      +input('confirmPassword', 'Повторите пароль', 'Повторите пароль', {},  errs)(type='password')
       button.btn.btn-lg.btn-light(type='submit') Зарегистрироваться

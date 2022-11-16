@@ -28,34 +28,34 @@ export class Users {
   @Column({ nullable: true })
   avatar: string;
 
-  @Column({ nullable: true })
+  @Column({ default: 'Не указан' })
   liveInCity: string;
 
-  @Column({ nullable: true })
-  birtdayDate: string;
+  @Column({ default: 'Не указан' })
+  birthdayDate: string;
 
-  @Column({ nullable: true })
+  @Column({ default: 'Не указано' })
   education: string;
 
-  @Column({ nullable: true })
+  @Column({ default: 'Не указано' })
   directions: string;
 
-  @Column({ nullable: true })
+  @Column({ default: 'Не указаны' })
   frameworks: string;
 
-  @Column({ nullable: true })
+  @Column({ default: 'Не указаны' })
   programmingLanguages: string;
 
-  @Column({ nullable: true })
+  @Column({ default: 'Не указан' })
   expirience: string;
 
-  @Column({ nullable: true })
+  @Column({ default: 'Не указаны' })
   databases: string;
 
-  @Column({ nullable: true })
+  @Column({ default: 'Не указан' })
   gender: string;
 
-  @Column({ nullable: true })
+  @Column({ default: 'Пусто' })
   aboutMe: string;
 
   @Column({ default: '' })

@@ -2,23 +2,40 @@ extends ./index.pug
 
 block header
   h1.mb-3.mt-3= `${firstName} ${lastName} ${middleName}`
+  include ./components/aboutModal.pug
+  include ./components/aboutWorkModal.pug
   .container.text-center
     .row
       .col
         h2 Общее:
         h3= `Пол: ${gender}`
         h3= `Город: ${liveInCity}`
-        h3= `Дата рождения: ${birtdayDate}`
-        h3= `Образование: [Education]`
-        button.btn.btn-primary.mt-5(type='button') Узнай обо мне больше!
+        h3= `Дата рождения: ${birthdayDate}`
+        h3= `Образование: ${education}`
+        button.btn.btn-primary.mt-5(type='button' data-bs-toggle="modal" data-bs-target="#about") Узнай обо мне больше!
       .col 
-        img.rounded.mx-auto.d-block(src=avatar, alt="Здесь аватар!")
+        img.rounded.mx-auto.d-block(src='./test.jpg' alt="Здесь аватар!" style="width:250px")
       .col 
         h2 Работа:
-        h3= `Направление: [directions]`
-        h3= `Фреймворки: [frameworks]`
-        h3= `Языки программирования: [programming languages]`
-        h3= `Опыт: [expirience]`
-        h3= `Базы данных: [databases]`
-        button.btn.btn-primary(type='button') Узнай о моей работе больше!
+        h3= `Направление: ${directions}`
+        h3= `Фреймворки: ${frameworks}`
+        h3= `Языки программирования: ${programmingLanguages}`
+        h3= `Опыт: ${expirience}`
+        h3= `Базы данных: ${databases}`
+        button.btn.btn-primary(type='button' data-bs-toggle="modal" data-bs-target="#aboutWork") Узнай о моей работе больше!
+  a.btn.btn-primary.mt-3(href='/profile/edit') Редактировать профиль
 block content 
+  .container.text-center.mt-5
+    h2.mb-3 Мои публикации:
+    form(action="/posts" method="post")
+      .form-floating.mb-3
+        textarea.form-control(name='post' id='post' placeholder='Ваша публикация' style="height: 100px") 
+        label(for='post') Что хотите опубликовать?
+      button.btn.btn-primary(type='submit') Опубликовать
+    .container
+      if (posts)
+        each post in posts
+          .container.text-center.mt-5
+            h2= `${firstName} пишет:`
+            h3= `${post}`
+
