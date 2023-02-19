@@ -1,0 +1,47 @@
+mixin input(propertyName, name, placeholder, body = {}, errors = {})
+  - classLineDiv = 'form-floating' + (!errors[propertyName] ? ' mb-3' : ' is-invalid')
+  - classLineInput = 'form-control form-control-lg' + (!errors[propertyName] ? '' : ' is-invalid')
+    div(class= classLineDiv)
+      input(
+        class= classLineInput 
+        name= propertyName
+        id= propertyName
+        placeholder=placeholder
+        value=body[propertyName]
+      )&attributes(attributes)
+      label(for= propertyName)= name
+      if errors[propertyName]
+        for err in errors[propertyName]
+          .invalid-feedback.mb-3= `${err}`
+
+mixin options(propertyName, name, placeholder, options, currentValue)
+  - classLineDiv = 'form-floating mb-3'
+  - classLineOptions = 'form-control form-control-lg'
+    div(class= classLineDiv)
+      select(
+        class= classLineOptions 
+        name= propertyName 
+        id= propertyName
+        placeholder=placeholder 
+      )&attributes(attributes)
+        each option in options
+          if option === currentValue
+            option(selected)= `${currentValue}`
+          else
+            option= `${option}`
+      label(for=propertyName)= `${name}`
+
+mixin checkboxButton(propertyName, name, options, currentValues)
+  label.text-light.col-sm-5.col-form-label= `${name}`
+  .form-check.form-check-inline.mb-3
+    for option, index in options
+      if currentValues.includes(option) 
+        input.btn-check(type='checkbox' value=option name=`${propertyName}[${index}]` id=`${propertyName}[${index}]` checked)
+      else
+        input.btn-check(type='checkbox' value=option name=`${propertyName}[${index}]` id=`${propertyName}[${index}]`)
+      label.btn.btn-outline-success(for=`${propertyName}[${index}]`)= `${option}`
+
+mixin textArea(propertyName, name, placeholder, body='')
+  .form-floating.mb-3
+    textarea.form-control(name=propertyName id=propertyName placeholder=placeholder value=`${body}`)&attributes(attributes)= body
+    label(for=propertyName)= `${name}`

@@ -1,0 +1,33 @@
+extends ./index.pug
+block header
+  - const educations = ['Высшее', 'Среднее профессиональное', 'Среднее общее', 'Основное общее', 'Начальное общее', 'Не указано'];
+  - const directionss = ['Backend', 'Frontend', 'Fullstack', 'Не указано']
+  - const frameworksList = ['Django', 'Laravel', 'NestJS', 'Express.js', 'Fastify', 'React JS', 'Angular', 'Flask', 'Node.js', 'Rails', 'Spring', 'Backbone.JS', 'Vue.JS']
+  - const languagesList = ['Python', 'JavaScript', 'TypeScript', 'Java', 'PHP', 'Ruby']
+  - const databasesList = ['PostGreSQL', 'MySQL', 'MongoDB', 'Redis', 'SQLite', 'Oracle', 'SQL Server']
+  - const genderList = ['Мужской', 'Женский', 'Не указан']
+  h1.mb-3.mt-3 Редактирование
+block content
+  .container.text-center.mt-5
+    form(action=`/users/${id}?_method=PATCH` method="post")
+      .row.text-center
+        .col
+          h1.mb-3.mt-3 О себе
+          input(type='hidden' name='id' id='id' value=`${id}`)
+          +input('firstName', 'Имя', 'Ваше Имя', errs)(type='text' value=`${firstName}`)
+          +input('middleName', 'Отчество', 'Ваше Отчество', errs)(type='text' value=`${middleName}`)
+          +input('lastName', 'Фамилия', 'Ваша Фамилия', errs)(type='text' value=`${lastName}`)
+          +input('email', 'Email', 'Ваш email', errs)(type='text' value=`${email}`)
+          +input('liveInCity', 'Город', 'Ваш город', errs)(type='text' value=`${liveInCity}`)
+          +input('birthdayDate', 'День рождения', 'Ваш день рождения', errs)(type='date' value=`${birthdayDate}`)
+          +options('education', 'Образование', 'Образование', educations, education)
+          +options('gender', 'Пол', 'Ваш пол', genderList, gender)
+          +textArea('aboutMe', 'Расскажите о себе', 'О себе', aboutMe)(style='height: 100px')
+        .col
+          h1.mb-3.mt-3 О работе
+          +options('directions', 'Направление', 'Направление', directionss, directions)
+          +checkboxButton('frameworks', 'Фреймворки' , frameworksList, frameworks)
+          +checkboxButton('programmingLanguages', 'Языки программирования', languagesList, programmingLanguages)
+          +checkboxButton('databases', `Базы данных`, databasesList, databases)
+          +textArea('expirience', 'Опишите здесь ваш опыт работы в подробностях', 'Oпыт', expirience)(style="height: 100px")= `${expirience}`
+      button.btn.btn-lg.btn-light(type='submit') Сохранить
