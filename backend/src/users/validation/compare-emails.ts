@@ -15,6 +15,9 @@ export class CheckEmail implements ValidatorConstraintInterface {
     const email = validationArguments.value;
     const userId = validationArguments.object['userId'];
     const exists = await this.usersService.findByEmail(email);
+    if (validationArguments.targetName === 'RecoverUserDto') {
+      return !!exists;
+    }
     if (userId && userId == exists?.id) {
       return true;
     }

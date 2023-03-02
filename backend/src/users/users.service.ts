@@ -7,6 +7,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { cipher, decipher } from '../common/secure/cipher';
 import { MailerService } from '@nestjs-modules/mailer';
 import { CreateUserDto } from './dto/create-user.dto';
+import { RecoverUserDto } from './dto/recover-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -60,6 +61,41 @@ export class UsersService {
     const updatedUser = this.usersRepository.merge(currentUser, data);
     await this.usersRepository.save(updatedUser);
     return updatedUser;
+  }
+
+  async recover({ email, frontendUrl }: RecoverUserDto): Promise<void> {
+    const recoverHash = cipher(email);
+    const currentUser = await this.findByEmail(email);
+    await this.usersRepository.update(currentUser.id, {
+      recover_hash: recoverHash,
+    });
+
+    setTimeout(async () => {
+      await this.usersRepository.update(currentUser.id, { recover_hash: null });
+    }, 900000);
+
+    const url = `${frontendUrl}/recovery/${recoverHash}`;
+
+    this.mailerService.sendMail({
+      to: email,
+      from: 'noreply@runit.com',
+      subject: 'Ссылка для изменения пароля на Blacking',
+      template: 'recover',
+      context: {
+        url,
+      },
+    });
+  }
+
+  async checkHash(hash: string): Promise<{ id: number | null }> {
+    const email = decipher(Buffer.from(hash, 'hex'));
+    const currentUser = await this.findByEmail(email);
+
+    if (currentUser && currentUser.recover_hash === hash) {
+      await this.usersRepository.update(currentUser.id, { recover_hash: null });
+      return { id: currentUser.id };
+    }
+    return { id: null };
   }
 
   async remove(id: number) {

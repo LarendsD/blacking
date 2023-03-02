@@ -21,6 +21,9 @@ export class User {
   @Column()
   password: string;
 
+  @Column({ nullable: true })
+  recover_hash?: string;
+
   @CreateDateColumn()
   created_at: string;
 

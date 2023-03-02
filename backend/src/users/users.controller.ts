@@ -13,6 +13,7 @@ import { ConfirmUserDto } from './dto/confirm-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { JwtAuthGuard } from '../session/guards/jwt-auth.guard';
+import { RecoverUserDto } from './dto/recover-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -37,6 +38,16 @@ export class UsersController {
   @Get(':id')
   findOne(@Param('id') id: number) {
     return this.usersService.findById(id);
+  }
+
+  @Post('recover')
+  async recover(@Body() recoverUserDto: RecoverUserDto) {
+    return this.usersService.recover(recoverUserDto);
+  }
+
+  @Get('recover/:hash')
+  async checkHash(@Param('hash') hash: string) {
+    return this.usersService.checkHash(hash);
   }
 
   @UseGuards(JwtAuthGuard)
