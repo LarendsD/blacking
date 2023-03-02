@@ -12,10 +12,14 @@ import { CheckEmail } from '../validation/compare-emails';
 import { ComparePasswords } from '../validation/compare-passwords';
 
 export class UpdateUserDto {
+  userId: string;
+
   @IsOptional()
   @IsEmail()
   @IsString()
-  @Validate(CheckEmail)
+  @Validate(CheckEmail, {
+    message: 'Email is already exists!',
+  })
   @Length(5, 50)
   email: string;
 
@@ -25,7 +29,9 @@ export class UpdateUserDto {
   @Matches(/[0-9]/)
   @Matches(/[a-z]/)
   @Matches(/[A-Z]/)
-  @Validate(CheckPassword)
+  @Validate(CheckPassword, {
+    message: 'Invalid password',
+  })
   currPassword: string;
 
   @IsOptional()
@@ -37,6 +43,8 @@ export class UpdateUserDto {
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  @Validate(ComparePasswords)
+  @Validate(ComparePasswords, {
+    message: 'Match password err!',
+  })
   confirmPassword?: string;
 }
