@@ -1,0 +1,5 @@
+export enum ITDirection {
+  WEB_BACKEND = 'WEB_BACKEND',
+  WEB_FRONTEND = 'WEB_FRONTEND',
+  WEB_FULLSTACK = 'WEB_FULLSTACK',
+}

@@ -15,7 +15,8 @@ export class CheckPassword implements ValidatorConstraintInterface {
 
   async validate(text: string, validationArguments: ValidationArguments) {
     const { ...object }: any = validationArguments.object;
-    const exists = await this.usersService.findById(object.id);
+    const exists = await this.usersService.findById(object.userId);
+
     return bcrypt.compareSync(object.currPassword, exists.password);
   }
 }

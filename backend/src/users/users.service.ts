@@ -8,6 +8,7 @@ import { cipher, decipher } from '../common/secure/cipher';
 import { MailerService } from '@nestjs-modules/mailer';
 import { CreateUserDto } from './dto/create-user.dto';
 import { RecoverUserDto } from './dto/recover-user.dto';
+import { UserProfile } from '../users-profile/entities/user-profile.entity';
 
 @Injectable()
 export class UsersService {
@@ -18,19 +19,25 @@ export class UsersService {
   ) {}
 
   async confirm({ password, email, frontendUrl }: ConfirmUserDto) {
-    const hash = cipher(JSON.stringify({ password, email }));
+    const hash = cipher(
+      JSON.stringify({ password, email: email.toLowerCase() }),
+    );
 
     const url = `${frontendUrl}/confirm/${hash}`;
 
-    await this.mailerService.sendMail({
-      to: email,
-      from: 'noreply@blacking.com',
-      subject: 'Confirm your email!',
-      template: 'confirm',
-      context: {
-        url,
-      },
-    });
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`This is your confirming url: ${url}`);
+    } else {
+      await this.mailerService.sendMail({
+        to: email,
+        from: 'noreply@blacking.com',
+        subject: 'Confirm your email!',
+        template: 'confirm',
+        context: {
+          url,
+        },
+      });
+    }
 
     return { email, hash };
   }
@@ -41,7 +48,18 @@ export class UsersService {
 
     user.email = email;
     user.password = password;
-    return this.usersRepository.save(user);
+
+    return this.usersRepository.manager.transaction(async (transaction) => {
+      await transaction.save(user);
+
+      const userProfile = new UserProfile();
+      userProfile.user = user;
+      return transaction.save(userProfile);
+    });
+  }
+
+  async findAll() {
+    return this.usersRepository.find();
   }
 
   async findByEmail(email: string) {
@@ -49,10 +67,7 @@ export class UsersService {
   }
 
   async findById(id: number) {
-    const { email, created_at, updated_at, password } =
-      await this.usersRepository.findOneBy({ id });
-
-    return { email, created_at, updated_at, password };
+    return this.usersRepository.findOneBy({ id });
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
@@ -63,36 +78,41 @@ export class UsersService {
     return updatedUser;
   }
 
-  async recover({ email, frontendUrl }: RecoverUserDto): Promise<void> {
+  async recover({ email, frontendUrl }: RecoverUserDto) {
     const recoverHash = cipher(email);
     const currentUser = await this.findByEmail(email);
     await this.usersRepository.update(currentUser.id, {
-      recover_hash: recoverHash,
+      recoverHash: recoverHash,
     });
 
     setTimeout(async () => {
-      await this.usersRepository.update(currentUser.id, { recover_hash: null });
+      await this.usersRepository.update(currentUser.id, { recoverHash: null });
     }, 900000);
 
     const url = `${frontendUrl}/recovery/${recoverHash}`;
 
-    this.mailerService.sendMail({
-      to: email,
-      from: 'noreply@runit.com',
-      subject: 'Ссылка для изменения пароля на Blacking',
-      template: 'recover',
-      context: {
-        url,
-      },
-    });
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`This is your recovering url: ${url}`);
+    } else {
+      this.mailerService.sendMail({
+        to: email,
+        from: 'noreply@runit.com',
+        subject: 'Ссылка для изменения пароля на Blacking',
+        template: 'recover',
+        context: {
+          url,
+        },
+      });
+    }
+    return { email, hash: recoverHash };
   }
 
   async checkHash(hash: string): Promise<{ id: number | null }> {
     const email = decipher(Buffer.from(hash, 'hex'));
     const currentUser = await this.findByEmail(email);
 
-    if (currentUser && currentUser.recover_hash === hash) {
-      await this.usersRepository.update(currentUser.id, { recover_hash: null });
+    if (currentUser && currentUser.recoverHash === hash) {
+      await this.usersRepository.update(currentUser.id, { recoverHash: null });
       return { id: currentUser.id };
     }
     return { id: null };

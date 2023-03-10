@@ -1,0 +1,7 @@
+export enum ITDatabase {
+  POSTGRES = 'POSTGRESQL',
+  MYSQL = 'MYSQL',
+  MONGODB = 'MONGODB',
+  ELASTICSEARCH = 'ELASTICSEARCH',
+  REDIS = 'REDIS',
+}

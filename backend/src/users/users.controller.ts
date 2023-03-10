@@ -19,6 +19,12 @@ import { RecoverUserDto } from './dto/recover-user.dto';
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  async findAll() {
+    return this.usersService.findAll();
+  }
+
   @Post()
   async create(
     @Body()
@@ -35,6 +41,7 @@ export class UsersController {
     return this.usersService.confirm(confirmUserDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: number) {
     return this.usersService.findById(id);

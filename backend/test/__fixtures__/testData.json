@@ -1,22 +1,59 @@
 {
     "users": {
         "create": {
-            "firstName": "Garry",
-            "lastName": "Selestia",
-            "email": "garrySel@mail.ru",
-            "password": "GarryPass123",
-            "confirmPassword": "GarryPass123"
+            "input": {
+                "frontendUrl": "localhost:3000",
+                "email": "garrySel@mail.ru",
+                "password": "GarryPass123",
+                "confirmPassword": "GarryPass123"
+            },
+            "output": {
+                "user": {
+                    "email": "garrysel@mail.ru",
+                    "recoverHash": null
+                },
+                "about": null,
+                "birthday": null,
+                "countryCity": null,
+                "education": null,
+                "educationType": null,
+                "firstName": null,
+                "gender": null,
+                "itDatabases": null,
+                "itDirection": null,
+                "itFrameworks": null,
+                "itLangs": null,
+                "itOtherInstruments": null,
+                "lastName": null,
+                "middleName": null
+            }
         },
         "read": {
-            "id": 1,
-            "firstName": "John",
-            "lastName": "Doe",
-            "email": "undefined@mail.ru"
+            "output": [
+                {
+                    "email": "undefined@mail.ru",
+                    "recoverHash": null
+                },
+                {
+                    "email": "null@mail.ru",
+                    "recoverHash": null
+                },
+                {
+                    "email": "nickAnderson@gmail.com",
+                    "recoverHash": null
+                }
+            ]
         },
         "update": {
-            "firstName": "Josh",
-            "lastName": "Brainward",
-            "email": "garryIsSilent@yandex.ru"
+            "input": {
+                "email": "garryIsSilent@yandex.ru",
+                "password": "NewPass1234",
+                "confirmPassword": "NewPass1234"
+            },
+            "output": {
+                "email": "garryIsSilent@yandex.ru",
+                "recoverHash": null
+            }
         },
         "login": {
             "email": "undefined@mail.ru",
@@ -25,6 +62,63 @@
         "sign": {
             "id": 1,
             "email": "undefined@mail.ru"
+        },
+        "recover": {
+            "frontendUrl": "localhost:3000"
+        }
+    },
+    "usersProfile": {
+        "create": {
+            "input": {
+                "firstName": "Денис",
+                "lastName": "Волков",
+                "middleName": "Иванович",
+                "gender": "MALE",
+                "countryCity": "Moscow",
+                "about": "Это я, Денис Волков!",
+                "education": "ELEMENTARY",
+                "educationType": "TECHNICAL",
+                "itDirection": "WEB_FULLSTACK"
+            },
+            "output": {
+                "firstName": "Денис",
+                "lastName": "Волков",
+                "middleName": "Иванович",
+                "gender": "MALE",
+                "countryCity": "Moscow",
+                "about": "Это я, Денис Волков!",
+                "education": "ELEMENTARY",
+                "educationType": "TECHNICAL",
+                "itDirection": "WEB_FULLSTACK"
+            },
+            "user": {
+                "email": "user@mail.ru",
+                "password": "userPass123"
+            }
+        },
+        "update": {
+            "input": {
+                "firstName": "Джейн",
+                "lastName": "Доу",
+                "middleName": "Нуллейбл",
+                "gender": "FEMALE",
+                "countryCity": "Магадан",
+                "about": "Это я, Джейн Доу!",
+                "education": "HIGHER",
+                "educationType": "TECHNICAL",
+                "itDirection": "WEB_FULLSTACK"
+            },
+            "output": {
+                "firstName": "Джейн",
+                "lastName": "Доу",
+                "middleName": "Нуллейбл",
+                "gender": "FEMALE",
+                "countryCity": "Магадан",
+                "about": "Это я, Джейн Доу!",
+                "education": "HIGHER",
+                "educationType": "TECHNICAL",
+                "itDirection": "WEB_FULLSTACK"
+            }
         }
     }
 }

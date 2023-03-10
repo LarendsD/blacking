@@ -1,0 +1,6 @@
+export enum Education {
+  ELEMENTARY = 'ELEMENTARY',
+  SECONDARY = 'SECONDARY',
+  VOCATIONAL = 'VOCATIONAL',
+  HIGHER = 'HIGHER',
+}

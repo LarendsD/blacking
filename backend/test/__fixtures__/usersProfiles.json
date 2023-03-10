@@ -1,0 +1,38 @@
+[
+  {
+    "firstName": "John",
+    "lastName": "Doe",
+    "middleName": "undef",
+    "gender": "MALE",
+    "birthday": null,
+    "countryCity": "New York",
+    "about": "it's me, John Doe!",
+    "education": "VOCATIONAL",
+    "educationType": "TECHNICAL",
+    "itDirection": "WEB_BACKEND"
+  },
+  {
+    "firstName": "Jane",
+    "lastName": "Doe",
+    "middleName": "nullable",
+    "gender": "FEMALE",
+    "birthday": null,
+    "countryCity": "Magadan",
+    "about": "it's me, Jane Doe!",
+    "education": "SECONDARY",
+    "educationType": "HUMANITIES",
+    "itDirection": "WEB_FRONTEND"
+  },
+  {
+    "firstName": "Josh",
+    "lastName": "Dae",
+    "middleName": "Joshington",
+    "gender": "MALE",
+    "birthday": null,
+    "countryCity": "Vashington",
+    "about": "it's me, Josh Dae!",
+    "education": "HIGHER",
+    "educationType": "TECHNICAL",
+    "itDirection": "WEB_FULLSTACK"
+  }
+]

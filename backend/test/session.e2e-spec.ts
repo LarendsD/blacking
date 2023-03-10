@@ -1,22 +1,15 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import getDatabaseConfig from '../src/common/config/database.config';
-import { SessionModule } from '../src/session/session.module';
-import getSessionConfig from '../src/session/config/session.config';
-import { NestExpressApplication } from '@nestjs/platform-express';
-import { join } from 'path';
-import { UsersModule } from '../src/users/users.module';
-import { UsersService } from '../src/users/users.service';
-import { UsersController } from '../src/users/users.controller';
-import { User } from '../src/users/entities/user.entity';
-import * as fs from 'fs';
-import { Repository } from 'typeorm';
 import { ValidationPipe } from '@nestjs/common';
-import { CheckEmail } from '../src/users/validation/compare-emails';
+import { JwtService } from '@nestjs/jwt';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { TestingModule, Test } from '@nestjs/testing';
+import { getDataSourceToken } from '@nestjs/typeorm';
+import { AppModule } from '../src/app.module';
+import { User } from '../src/users/entities/user.entity';
+import { Repository, DataSource } from 'typeorm';
+import * as fs from 'fs';
+import * as request from 'supertest';
 import { useContainer } from 'class-validator';
-import { SessionService } from '../src/session/session.service';
+import getSessionConfig from '../src/session/config/session.config';
 
 describe('Session Controller (e2e)', () => {
   let app: NestExpressApplication;
@@ -25,60 +18,58 @@ describe('Session Controller (e2e)', () => {
   let testData: Record<string, any>;
   let moduleFixture: TestingModule;
   let data: User[];
-  let sessionService: SessionService;
+  let jwtService: JwtService;
+  let token: string;
+  let dataSource: DataSource;
 
   beforeAll(async () => {
     moduleFixture = await Test.createTestingModule({
-      imports: [
-        UsersModule,
-        AppModule,
-        SessionModule,
-        TypeOrmModule.forRoot(getDatabaseConfig()),
-        TypeOrmModule.forFeature([User]),
-      ],
-      providers: [UsersService, CheckEmail],
-      controllers: [UsersController],
+      imports: [AppModule],
     }).compile();
-    sessionService = moduleFixture.get<SessionService>(SessionService);
 
-    users = JSON.parse(fs.readFileSync('__fixtures__/users.json', 'utf-8'));
+    jwtService = moduleFixture.get<JwtService>(JwtService);
+
+    users = JSON.parse(
+      fs.readFileSync(`${__dirname}/__fixtures__/users.json`, 'utf-8'),
+    );
     testData = JSON.parse(
-      fs.readFileSync('__fixtures__/testData.json', 'utf-8'),
+      fs.readFileSync(`${__dirname}/__fixtures__/testData.json`, 'utf-8'),
     ).users;
 
-    usersRepo = moduleFixture.get('UsersRepository');
-    data = usersRepo.create(users);
-
     app = moduleFixture.createNestApplication<NestExpressApplication>();
+    dataSource = moduleFixture.get(getDataSourceToken());
+    usersRepo = dataSource.getRepository(User);
+
     app.useGlobalPipes(new ValidationPipe());
-    app.setBaseViewsDir(join(__dirname, '..', 'views'));
-    app.setViewEngine('pug');
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
     app.use(getSessionConfig());
     await app.init();
   });
 
   beforeEach(async () => {
-    await usersRepo.insert(data);
+    data = usersRepo.create(users);
+    await usersRepo.save(data);
+    token = jwtService.sign(testData.sign);
   });
 
   it('login', async () => {
-    await request(app.getHttpServer())
-      .post('/login')
+    const { body } = await request(app.getHttpServer())
+      .post(`/login`)
       .send(testData.login)
-      .expect(302);
+      .expect(201);
+
+    expect(Object.keys(body)).toEqual(['access_token']);
   });
 
   it('logout', async () => {
-    const { access_token } = await sessionService.login(testData.sign);
     await request(app.getHttpServer())
       .post('/logout')
-      .auth(access_token, { type: 'bearer' })
-      .expect(302);
+      .auth(token, { type: 'bearer' })
+      .expect(201);
   });
 
   afterEach(async () => {
-    await usersRepo.clear();
+    await dataSource.query(`DELETE FROM users;`);
   });
 
   afterAll(async () => {

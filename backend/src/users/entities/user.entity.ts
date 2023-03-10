@@ -1,3 +1,4 @@
+import { UserProfile } from '../../users-profile/entities/user-profile.entity';
 import {
   Entity,
   Column,
@@ -7,10 +8,12 @@ import {
   BeforeInsert,
   AfterLoad,
   BeforeUpdate,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import { encrypt } from '../../common/secure/encrypt';
 
-@Entity()
+@Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -21,8 +24,16 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ nullable: true })
-  recover_hash?: string;
+  @Column({ nullable: true, name: 'recover_hash' })
+  recoverHash?: string;
+
+  @OneToOne(() => UserProfile, (userProfile) => userProfile.user, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({
+    name: 'user_profile_id',
+  })
+  userProfile?: UserProfile;
 
   @CreateDateColumn()
   created_at: string;

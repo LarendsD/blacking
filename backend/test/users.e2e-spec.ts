@@ -1,21 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import getDatabaseConfig from '../src/common/config/database.config';
-import { SessionModule } from '../src/session/session.module';
+import { getDataSourceToken } from '@nestjs/typeorm';
 import getSessionConfig from '../src/session/config/session.config';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { join } from 'path';
-import { UsersModule } from '../src/users/users.module';
-import { UsersService } from '../src/users/users.service';
-import { UsersController } from '../src/users/users.controller';
 import { User } from '../src/users/entities/user.entity';
 import * as fs from 'fs';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { ValidationPipe } from '@nestjs/common';
-import { CheckEmail } from '../src/users/validation/compare-emails';
 import { useContainer } from 'class-validator';
+import { JwtService } from '@nestjs/jwt';
 
 describe('UsersController (e2e)', () => {
   let app: NestExpressApplication;
@@ -24,31 +18,28 @@ describe('UsersController (e2e)', () => {
   let testData: Record<string, any>;
   let moduleFixture: TestingModule;
   let data: User[];
+  let jwtService: JwtService;
+  let token: string;
+  let dataSource: DataSource;
 
   beforeAll(async () => {
     moduleFixture = await Test.createTestingModule({
-      imports: [
-        UsersModule,
-        AppModule,
-        SessionModule,
-        TypeOrmModule.forRoot(getDatabaseConfig()),
-        TypeOrmModule.forFeature([User]),
-      ],
-      providers: [UsersService, CheckEmail],
-      controllers: [UsersController],
+      imports: [AppModule],
     }).compile();
 
-    users = JSON.parse(fs.readFileSync('__fixtures__/users.json', 'utf-8'));
+    jwtService = moduleFixture.get<JwtService>(JwtService);
+
+    users = JSON.parse(
+      fs.readFileSync(`${__dirname}/__fixtures__/users.json`, 'utf-8'),
+    );
     testData = JSON.parse(
-      fs.readFileSync('__fixtures__/testData.json', 'utf-8'),
+      fs.readFileSync(`${__dirname}/__fixtures__/testData.json`, 'utf-8'),
     ).users;
 
-    usersRepo = moduleFixture.get('UsersRepository');
-    data = usersRepo.create(users);
-
     app = moduleFixture.createNestApplication<NestExpressApplication>();
-    app.setBaseViewsDir(join(__dirname, '..', 'views'));
-    app.setViewEngine('pug');
+    dataSource = moduleFixture.get(getDataSourceToken());
+    usersRepo = dataSource.getRepository(User);
+
     app.useGlobalPipes(new ValidationPipe());
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
     app.use(getSessionConfig());
@@ -56,39 +47,107 @@ describe('UsersController (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await usersRepo.insert(data);
+    data = usersRepo.create(users);
+    await usersRepo.save(data);
+    token = jwtService.sign(testData.sign);
   });
 
-  it('create', async () => {
+  it('get users', async () => {
+    await request(app.getHttpServer()).get('/users').expect(401);
+
+    const { body } = await request(app.getHttpServer())
+      .get('/users')
+      .auth(token, { type: 'bearer' })
+      .expect(200);
+
+    expect(body).toMatchObject(testData.read.output);
+
+    await request(app.getHttpServer()).get(`/users/${body[0].id}`).expect(401);
+
+    const response = await request(app.getHttpServer())
+      .get(`/users/${body[0].id}`)
+      .auth(token, { type: 'bearer' })
+      .expect(200);
+
+    expect(response.body).toMatchObject(testData.read.output[0]);
+  });
+
+  it('confirm and create', async () => {
+    const { body } = await request(app.getHttpServer())
+      .post('/users/confirm')
+      .send(testData.create.input)
+      .expect(201);
+
+    expect(Object.keys(body)).toEqual(['email', 'hash']);
+
+    const response = await request(app.getHttpServer())
+      .post('/users')
+      .send({ hash: body.hash })
+      .expect(201);
+
+    expect(response.body).toMatchObject(testData.create.output);
+
     return request(app.getHttpServer())
       .post('/users')
-      .send(testData.create)
-      .expect({})
+      .send({ hash: body.hash })
+      .expect(400)
+      .send({ hash: 'invalid' })
+      .expect(400);
+  });
+
+  it('patch user', async () => {
+    const { id, email } = data[0];
+
+    const user = users.find((u) => u.email === email);
+
+    await request(app.getHttpServer())
+      .patch(`/users/${id}`)
+      .send({ userId: id, ...testData.update.input })
+      .expect(401);
+
+    const { body } = await request(app.getHttpServer())
+      .patch(`/users/${id}`)
+      .auth(token, { type: 'bearer' })
+      .send({
+        userId: id,
+        currPassword: user.password,
+        ...testData.update.input,
+      })
+      .expect(200);
+
+    expect(body).toMatchObject(testData.update.output);
+  });
+
+  it('delete user', async () => {
+    const { id } = data[0];
+
+    await request(app.getHttpServer()).delete(`/users/${id}`).expect(401);
+
+    await request(app.getHttpServer())
+      .delete(`/users/${id}`)
+      .auth(token, { type: 'bearer' })
+      .expect(200)
+      .expect({});
+  });
+
+  it('recover user', async () => {
+    const { email, id } = data[0];
+
+    const { body } = await request(app.getHttpServer())
+      .post(`/users/recover`)
+      .send({ email, ...testData.recover })
       .expect(201);
-  });
 
-  it('read', async () => {
-    const { body } = await request(app.getHttpServer())
-      .get('/users/1')
-      .expect(200);
-    expect(body).toMatchObject(testData.read);
-  });
+    expect(Object.keys(body)).toEqual(['email', 'hash']);
 
-  it('update', async () => {
-    const { body } = await request(app.getHttpServer())
-      .patch('/users/1')
-      .send(testData.update)
-      .expect(200);
-    expect(body).toMatchObject(testData.update);
-  });
-
-  it('delete', async () => {
-    await request(app.getHttpServer()).delete('/users/4').expect(200);
-    return request(app.getHttpServer()).get('/users/4').expect({}).expect(200);
+    await request(app.getHttpServer())
+      .get(`/users/recover/${body.hash}`)
+      .expect(200)
+      .expect({ id });
   });
 
   afterEach(async () => {
-    await usersRepo.clear();
+    await dataSource.query(`DELETE FROM users`);
   });
 
   afterAll(async () => {

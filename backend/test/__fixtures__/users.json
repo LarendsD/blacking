@@ -1,19 +1,13 @@
 [
     {
-        "firstName": "John",
-        "lastName": "Doe",
         "email": "undefined@mail.ru",
         "password": "NotFound404"
     },
     {
-        "firstName": "Jane",
-        "lastName": "Doe",
         "email": "null@mail.ru",
         "password": "Deleted401"
     },
     {
-        "firstName": "Nick",
-        "lastName": "Andersen",
         "email": "nickAnderson@gmail.com",
         "password": "NickLovesPickles345"
     }
