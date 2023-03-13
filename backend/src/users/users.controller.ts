@@ -14,6 +14,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { JwtAuthGuard } from '../session/guards/jwt-auth.guard';
 import { RecoverUserDto } from './dto/recover-user.dto';
+import { JwtPrivateUserAuthGuard } from '../session/guards/jwt-private-user-auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -57,13 +58,13 @@ export class UsersController {
     return this.usersService.checkHash(hash);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtPrivateUserAuthGuard)
   @Patch(':id')
   update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtPrivateUserAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: number) {
     return this.usersService.remove(+id);

@@ -35,6 +35,9 @@ export class User {
   })
   userProfile?: UserProfile;
 
+  @Column({ name: 'user_profile_id', nullable: true })
+  profileId: number;
+
   @CreateDateColumn()
   created_at: string;
 

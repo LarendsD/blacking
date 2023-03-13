@@ -49,7 +49,8 @@ describe('Session Controller (e2e)', () => {
   beforeEach(async () => {
     data = usersRepo.create(users);
     await usersRepo.save(data);
-    token = jwtService.sign(testData.sign);
+    const { id, email } = data[0];
+    token = jwtService.sign({ id, email });
   });
 
   it('login', async () => {

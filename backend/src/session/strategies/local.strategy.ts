@@ -8,6 +8,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private sessionService: SessionService) {
     super({
       usernameField: 'email',
+      profileId: true,
     });
   }
 

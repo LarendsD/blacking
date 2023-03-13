@@ -8,7 +8,7 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../session/guards/jwt-auth.guard';
+import { JwtPrivateProfileAuthGuard } from '../session/guards/jwt-private-profile-auth.guard';
 import { CreateUserProfileDto } from './dto/create-user-profile.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { UsersProfileService } from './users-profile.service';
@@ -35,13 +35,13 @@ export class UsersProfileController {
     return this.usersProfileService.findById(id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtPrivateProfileAuthGuard)
   @Patch(':id')
   update(@Param('id') id: number, @Body() updateUserDto: UpdateUserProfileDto) {
     return this.usersProfileService.update(id, updateUserDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtPrivateProfileAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: number) {
     return this.usersProfileService.remove(+id);

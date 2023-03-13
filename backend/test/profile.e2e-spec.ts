@@ -23,6 +23,7 @@ describe('UsersProfileController (e2e)', () => {
   let token: string;
   let usersProfileRepo: Repository<UserProfile>;
   let dataSource: DataSource;
+  let data: UserProfile[] = [];
 
   beforeAll(async () => {
     moduleFixture = await Test.createTestingModule({
@@ -68,25 +69,35 @@ describe('UsersProfileController (e2e)', () => {
 
           userProfile.user = saveData;
 
-          return transaction.save(userProfile);
+          const userProfileResult = await transaction.save(userProfile);
+
+          data.push(userProfileResult);
         }),
       );
     });
-    token = jwtService.sign({ id: 1, email: 'undefined@mail.ru' });
+    token = jwtService.sign({
+      id: data[0].user.id,
+      email: data[0].user.email,
+      profileId: data[0].id,
+    });
   });
 
-  it('get userProfiles', async () => {
-    const { body } = await request(app.getHttpServer())
-      .get('/users-profile')
-      .expect(200);
+  describe('get user profiles', () => {
+    it('get many', async () => {
+      const { body } = await request(app.getHttpServer())
+        .get('/users-profile')
+        .expect(200);
 
-    expect(body).toMatchObject(profiles);
+      expect(body).toMatchObject(profiles);
+    });
 
-    const response = await request(app.getHttpServer())
-      .get(`/users-profile/${body[0].id}`)
-      .expect(200);
+    it('get one', async () => {
+      const response = await request(app.getHttpServer())
+        .get(`/users-profile/${data[0].id}`)
+        .expect(200);
 
-    expect(response.body).toMatchObject(profiles[0]);
+      expect(response.body).toMatchObject(profiles[0]);
+    });
   });
 
   it('create userProfile', async () => {
@@ -99,51 +110,64 @@ describe('UsersProfileController (e2e)', () => {
     expect(body).toMatchObject(testData.create.output);
   });
 
-  it('update usersProfile', async () => {
-    const { id } = (
-      await usersProfileRepo.find({ select: { id: true } })
-    ).shift();
-
-    await request(app.getHttpServer())
-      .patch(`/users-profile/${id}`)
-      .send(testData.update.input)
-      .expect(401);
-
-    const { body } = await request(app.getHttpServer())
-      .patch(`/users-profile/${id}`)
-      .auth(token, { type: 'bearer' })
-      .send(testData.update.input)
-      .expect(200);
-
-    expect(body).toMatchObject(testData.update.output);
-  });
-
-  it('delete usersProfile', async () => {
-    const { id, user } = (
-      await usersProfileRepo.find({
-        select: { id: true },
-        relations: { user: true },
-      })
-    ).shift();
-
-    await request(app.getHttpServer())
-      .delete(`/users-profile/${id}`)
-      .send(testData.update.input)
-      .expect(401);
-
-    await request(app.getHttpServer())
-      .delete(`/users-profile/${id}`)
-      .auth(token, { type: 'bearer' })
-      .expect(200);
-
-    const userWithDeletedProfile = await usersRepo.find({
-      where: { id: user.id },
+  describe('update user profiles', () => {
+    it('unauthenticated', async () => {
+      return request(app.getHttpServer())
+        .patch(`/users-profile/${data[0].id}`)
+        .send(testData.update.input)
+        .expect(401);
     });
 
-    expect(userWithDeletedProfile).toEqual([]);
+    it('authenticated', async () => {
+      const { body } = await request(app.getHttpServer())
+        .patch(`/users-profile/${data[0].id}`)
+        .auth(token, { type: 'bearer' })
+        .send(testData.update.input)
+        .expect(200);
+
+      expect(body).toMatchObject(testData.update.output);
+    });
+
+    it('authenticated, but wrong user', async () => {
+      await request(app.getHttpServer())
+        .patch(`/users-profile/${data[1].id}`)
+        .auth(token, { type: 'bearer' })
+        .send(testData.update.input)
+        .expect(401);
+    });
+  });
+
+  describe('delete user profile', () => {
+    it('unauthenticated', async () => {
+      return request(app.getHttpServer())
+        .delete(`/users-profile/${data[0].id}`)
+        .expect(401);
+    });
+
+    it('authenticated', async () => {
+      await request(app.getHttpServer())
+        .delete(`/users-profile/${data[0].id}`)
+        .auth(token, { type: 'bearer' })
+        .expect(200);
+
+      const userWithDeletedProfile = await usersRepo.find({
+        where: { id: data[0].user.id },
+      });
+
+      expect(userWithDeletedProfile).toEqual([]);
+    });
+
+    it('authenticated, but wrong user', async () => {
+      await request(app.getHttpServer())
+        .delete(`/users-profile/${data[1].id}`)
+        .auth(token, { type: 'bearer' })
+        .send(testData.update.input)
+        .expect(401);
+    });
   });
 
   afterEach(async () => {
+    data = [];
     await dataSource.query(`DELETE FROM users`);
     await dataSource.query(`DELETE FROM user_profiles`);
   });

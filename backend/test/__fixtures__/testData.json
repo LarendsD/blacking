@@ -59,10 +59,6 @@
             "email": "undefined@mail.ru",
             "password": "NotFound404"
         },
-        "sign": {
-            "id": 1,
-            "email": "undefined@mail.ru"
-        },
         "recover": {
             "frontendUrl": "localhost:3000"
         }

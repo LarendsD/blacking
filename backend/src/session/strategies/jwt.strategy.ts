@@ -9,7 +9,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super(getJwtExtractConfig());
   }
 
-  async validate({ id, email }: any) {
-    return { id, email };
+  async validate({ id, email, profileId }: any) {
+    return { id, email, profileId };
   }
 }
