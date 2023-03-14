@@ -7,6 +7,7 @@ import getMailerConfig from './common/config/mailer.config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { UsersProfileModule } from './users-profile/users-profile.module';
 import getDataSourceConfig from './common/config/datasource.config';
+import { ColleagueshipModule } from './colleagueships/colleagueships.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import getDataSourceConfig from './common/config/datasource.config';
     UsersModule,
     UsersProfileModule,
     SessionModule,
+    ColleagueshipModule,
     TypeOrmModule.forRootAsync({
       useFactory: () => ({}),
       dataSourceFactory: async () => getDataSourceConfig(),

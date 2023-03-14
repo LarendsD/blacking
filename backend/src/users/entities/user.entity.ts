@@ -10,8 +10,10 @@ import {
   BeforeUpdate,
   OneToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { encrypt } from '../../common/secure/encrypt';
+import { Colleagueship } from '../../colleagueships/entities/colleagueship.entity';
 
 @Entity('users')
 export class User {
@@ -37,6 +39,9 @@ export class User {
 
   @Column({ name: 'user_profile_id', nullable: true })
   profileId: number;
+
+  @OneToMany(() => Colleagueship, (colleagueship) => colleagueship.colleague)
+  colleagues: Colleagueship[];
 
   @CreateDateColumn()
   created_at: string;
