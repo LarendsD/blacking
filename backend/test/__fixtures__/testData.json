@@ -116,5 +116,49 @@
                 "itDirection": "WEB_FULLSTACK"
             }
         }
-    }
+    },
+    "messages": {
+        "create": {
+            "input": {
+                "textContent": "Hi, my name is ${name}, please, look at this!",
+                "imageContent": ["/temp/cutePuppies.jpg", "/temp/cuteLooks.png"],
+                "videoContent": ["/temp/good.webm", "/temp/soFar.webm"],
+                "musicContent": ["/temp/soSad.mp4", "/temp/lolMusic.mp4"],
+                "otherContent": ["/temp/diffenetlyNotAVirus.exe", "/temp/yaPokakal.gif"]
+            },
+            "output": {
+                "textContent": "Hi, my name is ${name}, please, look at this!",
+                "imageContent": ["/temp/cutePuppies.jpg", "/temp/cuteLooks.png"],
+                "videoContent": ["/temp/good.webm", "/temp/soFar.webm"],
+                "musicContent": ["/temp/soSad.mp4", "/temp/lolMusic.mp4"],
+                "otherContent": ["/temp/diffenetlyNotAVirus.exe", "/temp/yaPokakal.gif"]
+            }
+        },
+        "read": {
+            "output": [
+                {
+                   "textContent": "Hi, my name is ${name}, how are you?",
+                   "imageContent": ["/temp/hello.jpg", "/temp/haveAGoodDay.png"]
+                },
+                {
+                  "textContent": "Hi, look at this funny videos!",
+                  "videoContent": ["/temp/funnyDog.webm", "/temp/killAWomen.webm"]
+                },
+                {
+                  "textContent": "Hi, this your documents for order.",
+                  "otherContent": ["/temp/orderOfCocaCola.docx", "/temp/orderOfPepsi.docx"]
+                }
+            ]
+        },
+        "update": {
+            "input": {
+                "textContent": "Well, i redacted this message, sorry!",
+                "musicContent": ["/temp/myyyyyyyyyy.mp4"]
+            },
+            "output": {
+                "textContent": "Well, i redacted this message, sorry!",
+                "musicContent": ["/temp/myyyyyyyyyy.mp4"]
+            }
+        }
+    } 
 }

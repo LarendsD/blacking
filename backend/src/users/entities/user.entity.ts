@@ -14,6 +14,7 @@ import {
 } from 'typeorm';
 import { encrypt } from '../../common/secure/encrypt';
 import { Colleagueship } from '../../colleagueships/entities/colleagueship.entity';
+import { Message } from '../../messages/entities/message.entity';
 
 @Entity('users')
 export class User {
@@ -42,6 +43,9 @@ export class User {
 
   @OneToMany(() => Colleagueship, (colleagueship) => colleagueship.colleague)
   colleagues: Colleagueship[];
+
+  @OneToMany(() => Message, (message) => message.sender)
+  messages: Message[];
 
   @CreateDateColumn()
   created_at: string;

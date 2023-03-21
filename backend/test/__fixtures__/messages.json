@@ -1,0 +1,18 @@
+[
+  {
+    "textContent": "Hi, my name is ${name}, how are you?",
+    "imageContent": ["/temp/hello.jpg", "/temp/haveAGoodDay.png"]
+  },
+  {
+    "textContent": "Hi, look at this funny videos!",
+    "videoContent": ["/temp/funnyDog.webm", "/temp/killAWomen.webm"]
+  },
+  {
+    "textContent": "Here, this is my favourite musics!",
+    "musicContent": ["/temp/myNameIsHa.mp4", "/temp/deathMusic.mp3"]
+  },
+  {
+    "textContent": "Hi, this your documents for order.",
+    "otherContent": ["/temp/orderOfCocaCola.docx", "/temp/orderOfPepsi.docx"]
+  }
+]
