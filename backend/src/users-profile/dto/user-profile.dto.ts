@@ -35,6 +35,10 @@ export class UserProfileDto {
   middleName: string;
 
   @IsOptional()
+  @IsString()
+  avatar: string;
+
+  @IsOptional()
   @IsEnum(Gender)
   gender: Gender;
 

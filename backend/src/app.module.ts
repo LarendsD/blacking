@@ -9,6 +9,7 @@ import { UsersProfileModule } from './users-profile/users-profile.module';
 import getDataSourceConfig from './common/config/datasource.config';
 import { ColleagueshipModule } from './colleagueships/colleagueships.module';
 import { MessagesModule } from './messages/messages.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { MessagesModule } from './messages/messages.module';
       dataSourceFactory: async () => getDataSourceConfig(),
     }),
     MailerModule.forRoot(getMailerConfig()),
+    UploadModule,
   ],
 })
 export class AppModule {}

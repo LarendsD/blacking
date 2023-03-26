@@ -25,6 +25,9 @@ export class UserProfile {
   @Column({ type: 'enum', enum: Gender, nullable: true })
   gender?: Gender;
 
+  @Column({ type: 'text', nullable: true })
+  avatar?: string;
+
   @Column({ type: 'date', nullable: true })
   birthday?: Date;
 
