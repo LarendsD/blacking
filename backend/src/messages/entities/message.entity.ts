@@ -7,9 +7,10 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Content } from '../../common/entities/content.entity';
 
 @Entity('messages')
-export class Message {
+export class Message extends Content {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -26,21 +27,6 @@ export class Message {
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'addresee_id' })
   addressee: User;
-
-  @Column('text', { name: 'text_content' })
-  textContent: string;
-
-  @Column('text', { name: 'image_content', array: true, nullable: true })
-  imageContent: string[];
-
-  @Column('text', { name: 'video_content', array: true, nullable: true })
-  videoContent: string[];
-
-  @Column('text', { name: 'music_content', array: true, nullable: true })
-  musicContent: string[];
-
-  @Column('text', { name: 'other_content', array: true, nullable: true })
-  otherContent: string[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: string;

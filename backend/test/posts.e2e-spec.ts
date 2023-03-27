@@ -10,18 +10,18 @@ import { DataSource, Repository } from 'typeorm';
 import { ValidationPipe } from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import { JwtService } from '@nestjs/jwt';
-import { Message } from '../src/messages/entities/message.entity';
+import { Post } from '../src/posts/entities/post.entity';
 
-describe('MessagesController (e2e)', () => {
+describe('PostsController (e2e)', () => {
   let app: NestExpressApplication;
   let usersRepo: Repository<User>;
-  let messagesRepo: Repository<Message>;
+  let postsRepo: Repository<Post>;
   let users: Array<Record<string, unknown>>;
-  let messages: Array<Record<string, unknown>>;
+  let posts: Array<Record<string, unknown>>;
   let testData: Record<string, any>;
   let moduleFixture: TestingModule;
   let userData: User[];
-  let messageData: Message[];
+  let postsData: Post[];
   let jwtService: JwtService;
   let token: string;
   let dataSource: DataSource;
@@ -36,7 +36,7 @@ describe('MessagesController (e2e)', () => {
     users = JSON.parse(
       fs.readFileSync(`${__dirname}/__fixtures__/users.json`, 'utf-8'),
     );
-    messages = JSON.parse(
+    posts = JSON.parse(
       fs.readFileSync(`${__dirname}/__fixtures__/contents.json`, 'utf-8'),
     );
     testData = JSON.parse(
@@ -46,7 +46,7 @@ describe('MessagesController (e2e)', () => {
     app = moduleFixture.createNestApplication<NestExpressApplication>();
     dataSource = moduleFixture.get(getDataSourceToken());
     usersRepo = dataSource.getRepository(User);
-    messagesRepo = dataSource.getRepository(Message);
+    postsRepo = dataSource.getRepository(Post);
 
     app.useGlobalPipes(new ValidationPipe());
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
@@ -57,95 +57,80 @@ describe('MessagesController (e2e)', () => {
   beforeEach(async () => {
     userData = usersRepo.create(users);
     await usersRepo.save(userData);
-    messageData = await messagesRepo.save([
+    postsData = await postsRepo.save([
       {
-        senderId: userData[0].id,
-        addresseeId: userData[1].id,
-        ...messages[0],
+        authorId: userData[0].id,
+        ...posts[0],
       },
       {
-        senderId: userData[0].id,
-        addresseeId: userData[2].id,
-        ...messages[1],
+        authorId: userData[0].id,
+        ...posts[1],
       },
       {
-        senderId: userData[1].id,
-        addresseeId: userData[2].id,
-        ...messages[2],
+        authorId: userData[1].id,
+        ...posts[2],
       },
       {
-        senderId: userData[2].id,
-        addresseeId: userData[0].id,
-        ...messages[3],
+        authorId: userData[2].id,
+        ...posts[3],
       },
     ]);
+
     const { id, email } = userData[0];
     token = jwtService.sign({ id, email });
   });
 
-  describe('get messages', () => {
-    it('unauthenticated', async () => {
-      await request(app.getHttpServer()).get('/messages').expect(401);
-    });
-
-    it('authenticated', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/messages')
-        .auth(token, { type: 'bearer' })
+  describe('get posts', () => {
+    it('get all', async () => {
+      const { body } = await request(app.getHttpServer())
+        .get('/posts')
         .expect(200);
 
-      expect(response.body).toMatchObject(testData.read.output);
+      expect(body).toMatchObject(posts);
     });
 
-    it('by id(unauthenticated)', async () => {
-      await request(app.getHttpServer())
-        .get(`/messages/${messageData[0].id}`)
-        .expect(401);
-    });
-
-    it('by id(authenticated)', async () => {
-      const response = await request(app.getHttpServer())
-        .get(`/messages/${messageData[0].id}`)
-        .auth(token, { type: 'bearer' })
+    it('get by id', async () => {
+      const { body } = await request(app.getHttpServer())
+        .get(`/posts/${postsData[1].id}`)
         .expect(200);
 
-      expect(response.body).toMatchObject(testData.read.output[0]);
+      expect(body).toMatchObject(testData.read.output[1]);
     });
   });
 
-  describe('create message', () => {
+  describe('create post', () => {
     it('unauthenticated', async () => {
       await request(app.getHttpServer())
-        .post('/messages')
-        .send({ addresseeId: userData[1].id, ...testData.create.input })
+        .post('/posts')
+        .send(testData.create.input)
         .expect(401);
     });
 
     it('authenticated', async () => {
       const { body } = await request(app.getHttpServer())
-        .post('/messages')
+        .post('/posts')
         .auth(token, { type: 'bearer' })
-        .send({ addresseeId: userData[1].id, ...testData.create.input })
+        .send(testData.create.input)
         .expect(201);
 
       expect(body).toMatchObject({
-        senderId: userData[0].id,
+        authorId: userData[0].id,
         ...testData.create.output,
       });
     });
   });
 
-  describe('update message', () => {
+  describe('update post', () => {
     it('unauthenticated', async () => {
       await request(app.getHttpServer())
-        .patch(`/messages/${messageData[0].id}`)
+        .patch(`/posts/${postsData[0].id}`)
         .send(testData.update.input)
         .expect(401);
     });
 
     it('authenticated', async () => {
       const { body } = await request(app.getHttpServer())
-        .patch(`/messages/${messageData[0].id}`)
+        .patch(`/posts/${postsData[0].id}`)
         .auth(token, { type: 'bearer' })
         .send(testData.update.input)
         .expect(200);
@@ -154,21 +139,21 @@ describe('MessagesController (e2e)', () => {
     });
   });
 
-  describe('delete message', () => {
+  describe('delete post', () => {
     it('unauthenticated', async () => {
       await request(app.getHttpServer())
-        .delete(`/messages/${messageData[0].id}`)
+        .delete(`/posts/${postsData[1].id}`)
         .expect(401);
     });
 
     it('authenticated', async () => {
       await request(app.getHttpServer())
-        .delete(`/messages/${messageData[0].id}`)
+        .delete(`/posts/${postsData[1].id}`)
         .auth(token, { type: 'bearer' })
         .expect(200);
 
-      const message = await messagesRepo.findOne({
-        where: { id: messageData[0].id },
+      const message = await postsRepo.findOne({
+        where: { id: postsData[1].id },
       });
 
       expect(message).toBeNull();
@@ -176,7 +161,7 @@ describe('MessagesController (e2e)', () => {
   });
 
   afterEach(async () => {
-    await dataSource.query(`DELETE FROM messages`);
+    await dataSource.query(`DELETE FROM posts`);
     return dataSource.query(`DELETE FROM users`);
   });
 

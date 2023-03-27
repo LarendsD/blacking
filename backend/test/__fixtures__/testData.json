@@ -121,7 +121,7 @@
             }
         }
     },
-    "messages": {
+    "contents": {
         "create": {
             "input": {
                 "textContent": "Hi, my name is ${name}, please, look at this!",
@@ -156,11 +156,11 @@
         },
         "update": {
             "input": {
-                "textContent": "Well, i redacted this message, sorry!",
+                "textContent": "Well, i redacted this content, sorry!",
                 "musicContent": ["/temp/myyyyyyyyyy.mp4"]
             },
             "output": {
-                "textContent": "Well, i redacted this message, sorry!",
+                "textContent": "Well, i redacted this content, sorry!",
                 "musicContent": ["/temp/myyyyyyyyyy.mp4"]
             }
         }

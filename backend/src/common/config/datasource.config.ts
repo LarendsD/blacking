@@ -5,6 +5,7 @@ import { UserProfile } from '../../users-profile/entities/user-profile.entity';
 import { newDb } from 'pg-mem';
 import { Colleagueship } from '../../colleagueships/entities/colleagueship.entity';
 import { Message } from '../../messages/entities/message.entity';
+import { Post } from '../../posts/entities/post.entity';
 
 export default async (): Promise<DataSource> => {
   config();
@@ -40,7 +41,7 @@ export default async (): Promise<DataSource> => {
         type: 'postgres',
         username: 'postgres',
         password: 'postgres',
-        entities: [User, UserProfile, Colleagueship, Message],
+        entities: [User, UserProfile, Colleagueship, Message, Post],
       });
 
       await dataSource.synchronize();
@@ -56,7 +57,7 @@ export default async (): Promise<DataSource> => {
         port: Number(process.env.DATABASE_PORT),
         url: process.env.DATABASE_URL,
         ssl: { rejectUnauthorized: false },
-        entities: [User, UserProfile, Colleagueship, Message],
+        entities: [User, UserProfile, Colleagueship, Message, Post],
       });
   }
 };

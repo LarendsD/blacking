@@ -10,6 +10,7 @@ import getDataSourceConfig from './common/config/datasource.config';
 import { ColleagueshipModule } from './colleagueships/colleagueships.module';
 import { MessagesModule } from './messages/messages.module';
 import { UploadModule } from './upload/upload.module';
+import { PostsModule } from './posts/posts.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { UploadModule } from './upload/upload.module';
     }),
     MailerModule.forRoot(getMailerConfig()),
     UploadModule,
+    PostsModule,
   ],
 })
 export class AppModule {}

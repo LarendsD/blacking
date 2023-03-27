@@ -1,29 +1,7 @@
-import { IsArray, IsNumber, IsOptional, IsString } from 'class-validator';
+import { ContentDto } from '../../common/dto/content.dto';
+import { IsNumber } from 'class-validator';
 
-export class CreateMessageDto {
+export class CreateMessageDto extends ContentDto {
   @IsNumber()
   addresseeId: number;
-
-  @IsString()
-  textContent: string;
-
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  imageContent: string[];
-
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  videoContent: string[];
-
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  musicContent: string[];
-
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  otherContent: string[];
 }
