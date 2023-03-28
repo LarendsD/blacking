@@ -11,6 +11,7 @@ import { ColleagueshipModule } from './colleagueships/colleagueships.module';
 import { MessagesModule } from './messages/messages.module';
 import { UploadModule } from './upload/upload.module';
 import { PostsModule } from './posts/posts.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { PostsModule } from './posts/posts.module';
     MailerModule.forRoot(getMailerConfig()),
     UploadModule,
     PostsModule,
+    CommentsModule,
   ],
 })
 export class AppModule {}

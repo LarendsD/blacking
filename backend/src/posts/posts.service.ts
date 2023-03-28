@@ -24,6 +24,11 @@ export class PostsService {
   async findAll() {
     return this.postsRepository.find({
       relations: { author: true },
+      order: {
+        createdAt: {
+          direction: 'desc',
+        },
+      },
     });
   }
 
