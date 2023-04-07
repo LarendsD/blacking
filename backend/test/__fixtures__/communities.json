@@ -1,0 +1,17 @@
+[
+  {
+      "name": "Python",
+      "avatar": "lol/py/th/on.png",
+      "textContent": "This is the biggest community ever!"
+  },
+  {
+      "name": "Windows community",
+      "avatar": "wi/nd/ow/s.jpg",
+      "textContent": "Windows the best!"
+  },
+  {
+      "name": "Linux community",
+      "avatar": "li/nu/x.jpg",
+      "textContent": "Linux the best"
+  }
+]

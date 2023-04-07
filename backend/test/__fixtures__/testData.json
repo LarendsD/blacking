@@ -164,5 +164,27 @@
                 "musicContent": ["/temp/myyyyyyyyyy.mp4"]
             }
         }
-    } 
+    },
+    "communities": {
+        "create": {
+            "input": {
+                "name": "My super community!",
+                "textContent": "This is my community, yay!",
+                "avatar": "my/av/at/ar.png"
+            },
+            "output": {
+                "name": "My super community!",
+                "textContent": "This is my community, yay!",
+                "avatar": "my/av/at/ar.png"
+            }
+        },
+        "update": {
+            "input": {
+                "name": "No, JavaScript is Best!"
+            },
+            "output": {
+                "name": "No, JavaScript is Best!"
+            }
+        }
+    }
 }

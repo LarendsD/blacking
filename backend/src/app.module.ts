@@ -13,6 +13,7 @@ import { UploadModule } from './upload/upload.module';
 import { PostsModule } from './posts/posts.module';
 import { CommentsModule } from './comments/comments.module';
 import { ReactionsModule } from './reactions/reactions.module';
+import { CommunitiesModule } from './communities/communities.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { ReactionsModule } from './reactions/reactions.module';
     PostsModule,
     CommentsModule,
     ReactionsModule,
+    CommunitiesModule,
   ],
 })
 export class AppModule {}
