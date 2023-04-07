@@ -1,6 +1,7 @@
 import { IsArray, IsOptional, IsString } from 'class-validator';
 
 export class ContentDto {
+  @IsOptional()
   @IsString()
   textContent: string;
 

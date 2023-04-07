@@ -21,6 +21,13 @@ export class Post extends Content {
   @JoinColumn({ name: 'author_id' })
   author: User;
 
+  @Column({ name: 'reposted_id', nullable: true })
+  repostedId: number;
+
+  @ManyToOne(() => Post, (post) => post.id, { nullable: true })
+  @JoinColumn({ name: 'reposted_id' })
+  repost: Post;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: string;
 }

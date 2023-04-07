@@ -1,7 +1,7 @@
 import { Column } from 'typeorm';
 
 export abstract class Content {
-  @Column('text', { name: 'text_content' })
+  @Column('text', { name: 'text_content', nullable: true })
   textContent: string;
 
   @Column('text', { name: 'image_content', array: true, nullable: true })
