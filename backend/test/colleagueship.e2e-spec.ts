@@ -12,6 +12,9 @@ import { useContainer } from 'class-validator';
 import { JwtService } from '@nestjs/jwt';
 import { Colleagueship } from '../src/colleagueships/entities/colleagueship.entity';
 import { ColleagueshipStatus } from '../src/colleagueships/entities/enums/colleagueship-status.enum';
+import { prepareColleagueship } from './helpers/prepare-colleagueships';
+import { prepareUsers } from './helpers/prepare-users';
+import { prepareJwtToken } from './helpers/prepare-jwt-token';
 
 describe('ColleagueshipController (e2e)', () => {
   let app: NestExpressApplication;
@@ -19,7 +22,7 @@ describe('ColleagueshipController (e2e)', () => {
   let colleagueshipRepo: Repository<Colleagueship>;
   let users: Array<Record<string, unknown>>;
   let moduleFixture: TestingModule;
-  let data: User[];
+  let userData: User[];
   let jwtService: JwtService;
   let token: string;
   let dataSource: DataSource;
@@ -47,32 +50,9 @@ describe('ColleagueshipController (e2e)', () => {
   });
 
   beforeEach(async () => {
-    data = usersRepo.create(users);
-    await usersRepo.save(data);
-    await colleagueshipRepo.save([
-      {
-        colleagueId: data[1].id,
-        userId: data[0].id,
-        status: ColleagueshipStatus.PENDING,
-      },
-      {
-        colleagueId: data[0].id,
-        userId: data[1].id,
-        status: ColleagueshipStatus.PENDING,
-      },
-      {
-        colleagueId: data[1].id,
-        userId: data[2].id,
-        status: ColleagueshipStatus.APPROVED,
-      },
-      {
-        colleagueId: data[2].id,
-        userId: data[1].id,
-        status: ColleagueshipStatus.APPROVED,
-      },
-    ]);
-    const { id, email } = data[0];
-    token = jwtService.sign({ id, email });
+    userData = await prepareUsers(usersRepo, users);
+    await prepareColleagueship(colleagueshipRepo, userData);
+    token = prepareJwtToken(jwtService, userData[0]);
   });
 
   describe('get colleagueship', () => {
@@ -80,13 +60,13 @@ describe('ColleagueshipController (e2e)', () => {
       await request(app.getHttpServer()).get('/colleagueship').expect(401);
 
       const { body } = await request(app.getHttpServer())
-        .get(`/colleagueship/${data[1].id}`)
+        .get(`/colleagueship/${userData[1].id}`)
         .expect(200);
 
       expect(body).toMatchObject([
         {
-          userId: data[1].id,
-          colleagueId: data[2].id,
+          userId: userData[1].id,
+          colleagueId: userData[2].id,
           status: ColleagueshipStatus.APPROVED,
         },
       ]);
@@ -100,8 +80,8 @@ describe('ColleagueshipController (e2e)', () => {
 
       expect(body).toMatchObject([
         {
-          userId: data[0].id,
-          colleagueId: data[1].id,
+          userId: userData[0].id,
+          colleagueId: userData[1].id,
           status: ColleagueshipStatus.PENDING,
         },
       ]);
@@ -117,22 +97,22 @@ describe('ColleagueshipController (e2e)', () => {
       const { body } = await request(app.getHttpServer())
         .post('/colleagueship')
         .auth(token, { type: 'bearer' })
-        .send({ colleagueId: data[2].id })
+        .send({ colleagueId: userData[2].id })
         .expect(201);
 
       expect(body).toMatchObject({
-        userId: data[0].id,
-        colleagueId: data[2].id,
+        userId: userData[0].id,
+        colleagueId: userData[2].id,
         status: ColleagueshipStatus.PENDING,
       });
 
       const colleague = await colleagueshipRepo.findOne({
-        where: { colleagueId: data[0].id, userId: data[2].id },
+        where: { colleagueId: userData[0].id, userId: userData[2].id },
       });
 
       expect(colleague).toMatchObject({
-        userId: data[2].id,
-        colleagueId: data[0].id,
+        userId: userData[2].id,
+        colleagueId: userData[0].id,
         status: ColleagueshipStatus.PENDING,
       });
     });
@@ -141,29 +121,29 @@ describe('ColleagueshipController (e2e)', () => {
   describe('update colleagueship', () => {
     it('unauthenticated', async () => {
       await request(app.getHttpServer())
-        .patch(`/colleagueship/${data[1].id}`)
+        .patch(`/colleagueship/${userData[1].id}`)
         .expect(401);
     });
     it('authenticated', async () => {
       const { body } = await request(app.getHttpServer())
-        .patch(`/colleagueship/${data[1].id}`)
+        .patch(`/colleagueship/${userData[1].id}`)
         .auth(token, { type: 'bearer' })
         .send({ status: ColleagueshipStatus.APPROVED })
         .expect(200);
 
       expect(body).toMatchObject({
-        userId: data[0].id,
-        colleagueId: data[1].id,
+        userId: userData[0].id,
+        colleagueId: userData[1].id,
         status: ColleagueshipStatus.APPROVED,
       });
 
       const colleague = await colleagueshipRepo.findOne({
-        where: { colleagueId: data[0].id, userId: data[1].id },
+        where: { colleagueId: userData[0].id, userId: userData[1].id },
       });
 
       expect(colleague).toMatchObject({
-        userId: data[1].id,
-        colleagueId: data[0].id,
+        userId: userData[1].id,
+        colleagueId: userData[0].id,
         status: ColleagueshipStatus.APPROVED,
       });
     });
@@ -172,18 +152,18 @@ describe('ColleagueshipController (e2e)', () => {
   describe('delete colleagueship', () => {
     it('unauthenticated', async () => {
       await request(app.getHttpServer())
-        .delete(`/colleagueship/${data[1].id}`)
+        .delete(`/colleagueship/${userData[1].id}`)
         .expect(401);
     });
 
     it('authenticated', async () => {
       await request(app.getHttpServer())
-        .delete(`/colleagueship/${data[1].id}`)
+        .delete(`/colleagueship/${userData[1].id}`)
         .auth(token, { type: 'bearer' })
         .expect(200);
 
       const colleague = await colleagueshipRepo.findOne({
-        where: { colleagueId: data[0].id, userId: data[1].id },
+        where: { colleagueId: userData[0].id, userId: userData[1].id },
       });
 
       expect(colleague).toBeNull();

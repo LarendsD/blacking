@@ -11,6 +11,9 @@ import { ValidationPipe } from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import { JwtService } from '@nestjs/jwt';
 import { Message } from '../src/messages/entities/message.entity';
+import { prepareUsers } from './helpers/prepare-users';
+import { prepareMessages } from './helpers/prepare-messages';
+import { prepareJwtToken } from './helpers/prepare-jwt-token';
 
 describe('MessagesController (e2e)', () => {
   let app: NestExpressApplication;
@@ -55,32 +58,9 @@ describe('MessagesController (e2e)', () => {
   });
 
   beforeEach(async () => {
-    userData = usersRepo.create(users);
-    await usersRepo.save(userData);
-    messageData = await messagesRepo.save([
-      {
-        senderId: userData[0].id,
-        addresseeId: userData[1].id,
-        ...messages[0],
-      },
-      {
-        senderId: userData[0].id,
-        addresseeId: userData[2].id,
-        ...messages[1],
-      },
-      {
-        senderId: userData[1].id,
-        addresseeId: userData[2].id,
-        ...messages[2],
-      },
-      {
-        senderId: userData[2].id,
-        addresseeId: userData[0].id,
-        ...messages[3],
-      },
-    ]);
-    const { id, email } = userData[0];
-    token = jwtService.sign({ id, email });
+    userData = await prepareUsers(usersRepo, users);
+    messageData = await prepareMessages(messagesRepo, userData, messages);
+    token = prepareJwtToken(jwtService, userData[0]);
   });
 
   describe('get messages', () => {

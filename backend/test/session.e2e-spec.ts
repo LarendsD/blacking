@@ -10,6 +10,8 @@ import * as fs from 'fs';
 import * as request from 'supertest';
 import { useContainer } from 'class-validator';
 import getSessionConfig from '../src/session/config/session.config';
+import { prepareUsers } from './helpers/prepare-users';
+import { prepareJwtToken } from './helpers/prepare-jwt-token';
 
 describe('Session Controller (e2e)', () => {
   let app: NestExpressApplication;
@@ -47,10 +49,8 @@ describe('Session Controller (e2e)', () => {
   });
 
   beforeEach(async () => {
-    data = usersRepo.create(users);
-    await usersRepo.save(data);
-    const { id, email } = data[0];
-    token = jwtService.sign({ id, email });
+    data = await prepareUsers(usersRepo, users);
+    token = prepareJwtToken(jwtService, data[0]);
   });
 
   it('login', async () => {

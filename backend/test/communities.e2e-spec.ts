@@ -11,6 +11,9 @@ import { ValidationPipe } from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import { JwtService } from '@nestjs/jwt';
 import { Community } from '../src/communities/entities/community.entity';
+import { prepareUsers } from './helpers/prepare-users';
+import { prepareCommunities } from './helpers/prepare-communities';
+import { prepareJwtToken } from './helpers/prepare-jwt-token';
 
 describe('CommunitiesController (e2e)', () => {
   let app: NestExpressApplication;
@@ -57,14 +60,11 @@ describe('CommunitiesController (e2e)', () => {
   });
 
   beforeEach(async () => {
-    userData = usersRepo.create(users);
-    await usersRepo.save(userData);
+    userData = await prepareUsers(usersRepo, users);
 
-    communityData = communitiesRepo.create(communities);
-    await communitiesRepo.save(communityData);
+    communityData = await prepareCommunities(communitiesRepo, communities);
 
-    const { id, email } = userData[0];
-    token = jwtService.sign({ id, email });
+    token = prepareJwtToken(jwtService, userData[0]);
   });
 
   describe('read community', () => {

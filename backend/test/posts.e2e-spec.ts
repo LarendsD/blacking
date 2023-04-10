@@ -11,6 +11,9 @@ import { ValidationPipe } from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import { JwtService } from '@nestjs/jwt';
 import { Post } from '../src/posts/entities/post.entity';
+import { prepareUsers } from './helpers/prepare-users';
+import { preparePosts } from './helpers/prepare-posts';
+import { prepareJwtToken } from './helpers/prepare-jwt-token';
 
 describe('PostsController (e2e)', () => {
   let app: NestExpressApplication;
@@ -55,29 +58,10 @@ describe('PostsController (e2e)', () => {
   });
 
   beforeEach(async () => {
-    userData = usersRepo.create(users);
-    await usersRepo.save(userData);
-    postsData = await postsRepo.save([
-      {
-        authorId: userData[0].id,
-        ...posts[0],
-      },
-      {
-        authorId: userData[0].id,
-        ...posts[1],
-      },
-      {
-        authorId: userData[1].id,
-        ...posts[2],
-      },
-      {
-        authorId: userData[2].id,
-        ...posts[3],
-      },
-    ]);
+    userData = await prepareUsers(usersRepo, users);
+    postsData = await preparePosts(postsRepo, posts, userData);
 
-    const { id, email } = userData[0];
-    token = jwtService.sign({ id, email });
+    token = prepareJwtToken(jwtService, userData[0]);
   });
 
   describe('get posts', () => {

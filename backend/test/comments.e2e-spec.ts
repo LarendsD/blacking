@@ -12,6 +12,10 @@ import { useContainer } from 'class-validator';
 import { JwtService } from '@nestjs/jwt';
 import { Post } from '../src/posts/entities/post.entity';
 import { Comment } from '../src/comments/entities/comment.entity';
+import { prepareUsers } from './helpers/prepare-users';
+import { preparePosts } from './helpers/prepare-posts';
+import { prepareComments } from './helpers/prepare-comments';
+import { prepareJwtToken } from './helpers/prepare-jwt-token';
 
 describe('CommentsController (e2e)', () => {
   let app: NestExpressApplication;
@@ -59,47 +63,16 @@ describe('CommentsController (e2e)', () => {
   });
 
   beforeEach(async () => {
-    userData = usersRepo.create(users);
-    await usersRepo.save(userData);
-    postsData = await postsRepo.save([
-      {
-        authorId: userData[0].id,
-        ...contents[0],
-      },
-      {
-        authorId: userData[0].id,
-        ...contents[1],
-      },
-      {
-        authorId: userData[1].id,
-        ...contents[2],
-      },
-      {
-        authorId: userData[2].id,
-        ...contents[3],
-      },
-    ]);
+    userData = await prepareUsers(usersRepo, users);
+    postsData = await preparePosts(postsRepo, contents, userData);
 
-    commentsData = await commentsRepo.save([
-      {
-        postId: postsData[1].id,
-        authorId: userData[0].id,
-        ...contents[2],
-      },
-      {
-        postId: postsData[0].id,
-        authorId: userData[2].id,
-        ...contents[0],
-      },
-      {
-        postId: postsData[2].id,
-        authorId: userData[0].id,
-        ...contents[1],
-      },
-    ]);
-
-    const { id, email } = userData[0];
-    token = jwtService.sign({ id, email });
+    commentsData = await prepareComments(
+      commentsRepo,
+      userData,
+      postsData,
+      contents,
+    );
+    token = prepareJwtToken(jwtService, userData[0]);
   });
 
   describe('get comments', () => {

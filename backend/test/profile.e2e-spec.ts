@@ -11,6 +11,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import { JwtService } from '@nestjs/jwt';
 import { UserProfile } from '../src/users-profile/entities/user-profile.entity';
+import { prepareUsersWithProfiles } from './helpers/prepare-users-profile';
 
 describe('UsersProfileController (e2e)', () => {
   let app: NestExpressApplication;
@@ -23,7 +24,7 @@ describe('UsersProfileController (e2e)', () => {
   let token: string;
   let usersProfileRepo: Repository<UserProfile>;
   let dataSource: DataSource;
-  let data: UserProfile[] = [];
+  let userProfileData: UserProfile[];
 
   beforeAll(async () => {
     moduleFixture = await Test.createTestingModule({
@@ -54,31 +55,17 @@ describe('UsersProfileController (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await usersRepo.manager.transaction(async (transaction) => {
-      await Promise.all(
-        users.map(async (user, index) => {
-          const saveData = transaction.create(User, user);
-          await transaction.save(saveData);
+    userProfileData = await prepareUsersWithProfiles(
+      usersRepo,
+      users,
+      profiles,
+    );
 
-          const userProfileEntity = new UserProfile();
-          const userProfile = transaction.merge(
-            UserProfile,
-            userProfileEntity,
-            profiles[index],
-          );
-
-          userProfile.user = saveData;
-
-          const userProfileResult = await transaction.save(userProfile);
-
-          data.push(userProfileResult);
-        }),
-      );
-    });
+    const [userToSign] = userProfileData;
     token = jwtService.sign({
-      id: data[0].user.id,
-      email: data[0].user.email,
-      profileId: data[0].id,
+      id: userToSign.user.id,
+      profileId: userToSign.id,
+      email: userToSign.user.email,
     });
   });
 
@@ -93,7 +80,7 @@ describe('UsersProfileController (e2e)', () => {
 
     it('get one', async () => {
       const response = await request(app.getHttpServer())
-        .get(`/users-profile/${data[0].id}`)
+        .get(`/users-profile/${userProfileData[0].id}`)
         .expect(200);
 
       expect(response.body).toMatchObject(profiles[0]);
@@ -113,14 +100,14 @@ describe('UsersProfileController (e2e)', () => {
   describe('update user profiles', () => {
     it('unauthenticated', async () => {
       return request(app.getHttpServer())
-        .patch(`/users-profile/${data[0].id}`)
+        .patch(`/users-profile/${userProfileData[0].id}`)
         .send(testData.update.input)
         .expect(401);
     });
 
     it('authenticated', async () => {
       const { body } = await request(app.getHttpServer())
-        .patch(`/users-profile/${data[0].id}`)
+        .patch(`/users-profile/${userProfileData[0].id}`)
         .auth(token, { type: 'bearer' })
         .send(testData.update.input)
         .expect(200);
@@ -130,7 +117,7 @@ describe('UsersProfileController (e2e)', () => {
 
     it('authenticated, but wrong user', async () => {
       await request(app.getHttpServer())
-        .patch(`/users-profile/${data[1].id}`)
+        .patch(`/users-profile/${userProfileData[1].id}`)
         .auth(token, { type: 'bearer' })
         .send(testData.update.input)
         .expect(401);
@@ -140,18 +127,18 @@ describe('UsersProfileController (e2e)', () => {
   describe('delete user profile', () => {
     it('unauthenticated', async () => {
       return request(app.getHttpServer())
-        .delete(`/users-profile/${data[0].id}`)
+        .delete(`/users-profile/${userProfileData[0].id}`)
         .expect(401);
     });
 
     it('authenticated', async () => {
       await request(app.getHttpServer())
-        .delete(`/users-profile/${data[0].id}`)
+        .delete(`/users-profile/${userProfileData[0].id}`)
         .auth(token, { type: 'bearer' })
         .expect(200);
 
       const userWithDeletedProfile = await usersRepo.find({
-        where: { id: data[0].user.id },
+        where: { id: userProfileData[0].user.id },
       });
 
       expect(userWithDeletedProfile).toEqual([]);
@@ -159,7 +146,7 @@ describe('UsersProfileController (e2e)', () => {
 
     it('authenticated, but wrong user', async () => {
       await request(app.getHttpServer())
-        .delete(`/users-profile/${data[1].id}`)
+        .delete(`/users-profile/${userProfileData[1].id}`)
         .auth(token, { type: 'bearer' })
         .send(testData.update.input)
         .expect(401);
@@ -167,7 +154,6 @@ describe('UsersProfileController (e2e)', () => {
   });
 
   afterEach(async () => {
-    data = [];
     await dataSource.query(`DELETE FROM users`);
     await dataSource.query(`DELETE FROM user_profiles`);
   });

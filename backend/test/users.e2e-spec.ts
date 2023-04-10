@@ -10,6 +10,8 @@ import { DataSource, Repository } from 'typeorm';
 import { ValidationPipe } from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import { JwtService } from '@nestjs/jwt';
+import { prepareUsers } from './helpers/prepare-users';
+import { prepareJwtToken } from './helpers/prepare-jwt-token';
 
 describe('UsersController (e2e)', () => {
   let app: NestExpressApplication;
@@ -47,10 +49,8 @@ describe('UsersController (e2e)', () => {
   });
 
   beforeEach(async () => {
-    data = usersRepo.create(users);
-    await usersRepo.save(data);
-    const { id, email } = data[0];
-    token = jwtService.sign({ id, email });
+    data = await prepareUsers(usersRepo, users);
+    token = prepareJwtToken(jwtService, data[0]);
   });
 
   describe('get users', () => {

@@ -14,6 +14,10 @@ import { Post } from '../src/posts/entities/post.entity';
 import { PostReaction } from '../src/reactions/entities/post-reaction.entity';
 import { ReactionType } from '../src/reactions/entities/enums/reaction-type.enum';
 import { SubjectType } from '../src/reactions/dto/enums/subject-type.enum';
+import { prepareUsers } from './helpers/prepare-users';
+import { preparePosts } from './helpers/prepare-posts';
+import { prepareReactions } from './helpers/prepare-reactions';
+import { prepareJwtToken } from './helpers/prepare-jwt-token';
 
 describe('ReactionsController (e2e)', () => {
   let app: NestExpressApplication;
@@ -57,51 +61,11 @@ describe('ReactionsController (e2e)', () => {
   });
 
   beforeEach(async () => {
-    userData = usersRepo.create(users);
-    await usersRepo.save(userData);
-    postsData = await postsRepo.save([
-      {
-        authorId: userData[0].id,
-        ...posts[0],
-      },
-      {
-        authorId: userData[0].id,
-        ...posts[1],
-      },
-      {
-        authorId: userData[1].id,
-        ...posts[2],
-      },
-      {
-        authorId: userData[2].id,
-        ...posts[3],
-      },
-    ]);
-    reactionsData = await reactionsRepo.save([
-      {
-        postId: postsData[0].id,
-        userId: userData[0].id,
-        reactionType: ReactionType.POSITIVE,
-      },
-      {
-        postId: postsData[1].id,
-        userId: userData[1].id,
-        reactionType: ReactionType.NEGATIVE,
-      },
-      {
-        postId: postsData[0].id,
-        userId: userData[2].id,
-        reactionType: ReactionType.NEGATIVE,
-      },
-      {
-        postId: postsData[2].id,
-        userId: userData[0].id,
-        reactionType: ReactionType.POSITIVE,
-      },
-    ]);
+    userData = await prepareUsers(usersRepo, users);
+    postsData = await preparePosts(postsRepo, posts, userData);
+    reactionsData = await prepareReactions(reactionsRepo, postsData, userData);
 
-    const { id, email } = userData[0];
-    token = jwtService.sign({ id, email });
+    token = prepareJwtToken(jwtService, userData[0]);
   });
 
   it('get reactions', async () => {
