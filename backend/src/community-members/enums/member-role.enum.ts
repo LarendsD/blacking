@@ -1,0 +1,9 @@
+export enum MemberRole {
+  ADMIN = 'ADMIN',
+  MODERATOR = 'MODERATOR',
+  POSTER = 'POSTER',
+  BANHAMMER = 'BANHAMMER',
+  VIEWER = 'VIEWER',
+  BANNED = 'BANNED',
+  MUTED = 'MUTED',
+}

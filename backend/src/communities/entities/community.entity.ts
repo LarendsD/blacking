@@ -2,10 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { CommunityType } from './enums/community-type.enum';
 import { Content } from '../../common/entities/content.entity';
+import { CommunityMember } from '../../community-members/entities/community-member.entity';
 
 @Entity('communities')
 export class Community extends Content {
@@ -22,6 +24,9 @@ export class Community extends Content {
     name: 'community_type',
   })
   communityType: CommunityType[];
+
+  @OneToMany(() => CommunityMember, (communityMember) => communityMember.id)
+  communityMembers: CommunityMember[];
 
   @Column('text', { nullable: true })
   avatar: string;

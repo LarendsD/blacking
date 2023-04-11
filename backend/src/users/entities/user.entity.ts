@@ -15,6 +15,7 @@ import {
 import { encrypt } from '../../common/secure/encrypt';
 import { Colleagueship } from '../../colleagueships/entities/colleagueship.entity';
 import { Message } from '../../messages/entities/message.entity';
+import { CommunityMember } from '../../community-members/entities/community-member.entity';
 
 @Entity('users')
 export class User {
@@ -46,6 +47,9 @@ export class User {
 
   @OneToMany(() => Message, (message) => message.sender)
   messages: Message[];
+
+  @OneToMany(() => CommunityMember, (communityMember) => communityMember.id)
+  memberInCommunities: CommunityMember[];
 
   @CreateDateColumn()
   created_at: string;

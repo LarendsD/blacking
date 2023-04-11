@@ -14,6 +14,8 @@ import { PostsModule } from './posts/posts.module';
 import { CommentsModule } from './comments/comments.module';
 import { ReactionsModule } from './reactions/reactions.module';
 import { CommunitiesModule } from './communities/communities.module';
+import { CommunityMembersModule } from './community-members/community-members.module';
+import { CaslModule } from './casl/casl.module';
 
 @Module({
   imports: [
@@ -33,6 +35,8 @@ import { CommunitiesModule } from './communities/communities.module';
     CommentsModule,
     ReactionsModule,
     CommunitiesModule,
+    CommunityMembersModule,
+    CaslModule,
   ],
 })
 export class AppModule {}

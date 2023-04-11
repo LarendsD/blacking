@@ -13,5 +13,10 @@
       "name": "Linux community",
       "avatar": "li/nu/x.jpg",
       "textContent": "Linux the best"
+  },
+  {
+      "name": "JavaScript",
+      "avatar": "ja/va/sc/ri/pt.jpg",
+      "textContent": "Dynamic types are the best!"
   }
 ]

@@ -10,6 +10,7 @@ import { Comment } from '../../comments/entities/comment.entity';
 import { PostReaction } from '../../reactions/entities/post-reaction.entity';
 import { CommentReaction } from '../../reactions/entities/comment-reaction.entity';
 import { Community } from '../../communities/entities/community.entity';
+import { CommunityMember } from '../../community-members/entities/community-member.entity';
 
 export default async (): Promise<DataSource> => {
   config();
@@ -55,6 +56,7 @@ export default async (): Promise<DataSource> => {
           PostReaction,
           CommentReaction,
           Community,
+          CommunityMember,
         ],
       });
 
@@ -81,6 +83,7 @@ export default async (): Promise<DataSource> => {
           PostReaction,
           CommentReaction,
           Community,
+          CommunityMember,
         ],
       });
   }

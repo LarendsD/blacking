@@ -9,5 +9,5 @@ export class PostReaction extends Reaction {
 
   @ManyToOne(() => Post, (post) => post.id)
   @JoinColumn({ name: 'post_id' })
-  post: Post;
+  post?: Post;
 }
