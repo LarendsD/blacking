@@ -8,6 +8,7 @@ import {
 import { CommunityType } from './enums/community-type.enum';
 import { Content } from '../../common/entities/content.entity';
 import { CommunityMember } from '../../community-members/entities/community-member.entity';
+import { Post } from '../../posts/entities/post.entity';
 
 @Entity('communities')
 export class Community extends Content {
@@ -25,8 +26,11 @@ export class Community extends Content {
   })
   communityType: CommunityType[];
 
-  @OneToMany(() => CommunityMember, (communityMember) => communityMember.id)
-  communityMembers: CommunityMember[];
+  @OneToMany(() => CommunityMember, (communityMember) => communityMember.member)
+  members: CommunityMember[];
+
+  @OneToMany(() => Post, (post) => post.id)
+  posts: Post[];
 
   @Column('text', { nullable: true })
   avatar: string;

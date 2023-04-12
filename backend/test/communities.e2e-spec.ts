@@ -14,11 +14,14 @@ import { Community } from '../src/communities/entities/community.entity';
 import { prepareUsers } from './helpers/prepare-users';
 import { prepareCommunities } from './helpers/prepare-communities';
 import { prepareJwtToken } from './helpers/prepare-jwt-token';
+import { CommunityMember } from '../src/community-members/entities/community-member.entity';
+import { MemberRole } from '../src/community-members/enums/member-role.enum';
 
 describe('CommunitiesController (e2e)', () => {
   let app: NestExpressApplication;
   let usersRepo: Repository<User>;
   let communitiesRepo: Repository<Community>;
+  let communityMembersRepo: Repository<CommunityMember>;
   let users: Array<Record<string, unknown>>;
   let communities: Array<Record<string, unknown>>;
   let testData: Record<string, any>;
@@ -52,6 +55,7 @@ describe('CommunitiesController (e2e)', () => {
     dataSource = moduleFixture.get(getDataSourceToken());
     usersRepo = dataSource.getRepository(User);
     communitiesRepo = dataSource.getRepository(Community);
+    communityMembersRepo = dataSource.getRepository(CommunityMember);
 
     app.useGlobalPipes(new ValidationPipe());
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
@@ -63,6 +67,11 @@ describe('CommunitiesController (e2e)', () => {
     userData = await prepareUsers(usersRepo, users);
 
     communityData = await prepareCommunities(communitiesRepo, communities);
+    await communityMembersRepo.save({
+      communityId: communityData[0].id,
+      memberId: userData[0].id,
+      memberRole: MemberRole.ADMIN,
+    });
 
     token = prepareJwtToken(jwtService, userData[0]);
   });
@@ -95,7 +104,7 @@ describe('CommunitiesController (e2e)', () => {
     expect(body).toMatchObject(testData.create.output);
   });
 
-  it('update commmunity', async () => {
+  it('update community', async () => {
     const { body } = await request(app.getHttpServer())
       .patch(`/communities/${communityData[0].id}`)
       .auth(token, { type: 'bearer' })
@@ -105,7 +114,7 @@ describe('CommunitiesController (e2e)', () => {
     expect(body).toMatchObject(testData.update.output);
   });
 
-  it('delete communtiy', async () => {
+  it('delete community', async () => {
     await request(app.getHttpServer())
       .delete(`/communities/${communityData[0].id}`)
       .auth(token, { type: 'bearer' })
@@ -119,6 +128,7 @@ describe('CommunitiesController (e2e)', () => {
   });
 
   afterEach(async () => {
+    await dataSource.query(`DELETE FROM community_members`);
     await dataSource.query(`DELETE FROM communities`);
     return dataSource.query(`DELETE FROM users`);
   });

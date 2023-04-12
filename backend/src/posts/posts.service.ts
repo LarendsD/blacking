@@ -39,6 +39,10 @@ export class PostsService {
     });
   }
 
+  async findByCommunityId(communityId: number) {
+    return this.postsRepository.find({ where: { communityId } });
+  }
+
   async update(id: number, userId: number, updatePostDto: UpdatePostDto) {
     await this.postsRepository.update({ authorId: userId, id }, updatePostDto);
 

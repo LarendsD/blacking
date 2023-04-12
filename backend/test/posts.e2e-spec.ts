@@ -76,6 +76,7 @@ describe('PostsController (e2e)', () => {
     it('get by id', async () => {
       const { body } = await request(app.getHttpServer())
         .get(`/posts/${postsData[1].id}`)
+        .auth(token, { type: 'bearer' })
         .expect(200);
 
       expect(body).toMatchObject(testData.read.output[1]);

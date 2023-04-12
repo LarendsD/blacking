@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
+import { Community } from '../../communities/entities/community.entity';
 
 @Entity('posts')
 export class Post extends Content {
@@ -20,6 +21,13 @@ export class Post extends Content {
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'author_id' })
   author: User;
+
+  @Column({ name: 'community_id', nullable: true })
+  communityId: number;
+
+  @ManyToOne(() => Community, (community) => community.id)
+  @JoinColumn({ name: 'community_id' })
+  community: Community;
 
   @Column({ name: 'reposted_id', nullable: true })
   repostedId: number;

@@ -13,6 +13,9 @@ import { CreateCommunityDto } from './dto/create-community.dto';
 import { UpdateCommunityDto } from './dto/update-community.dto';
 import { User } from '../users/user.decorator';
 import { JwtAuthGuard } from '../session/guards/jwt-auth.guard';
+import { RolesGuard } from './guards/roles.guard';
+import { Permissions } from '../common/decorators/permissions.decorator';
+import { Action } from '../casl/action.enum';
 
 @Controller('communities')
 export class CommunitiesController {
@@ -37,7 +40,8 @@ export class CommunitiesController {
     return this.communitiesService.findOne(+id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Permissions(Action.Update)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -46,7 +50,8 @@ export class CommunitiesController {
     return this.communitiesService.update(+id, updateCommunityDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Permissions(Action.Delete)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.communitiesService.remove(+id);

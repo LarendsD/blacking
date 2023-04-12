@@ -18,7 +18,7 @@ import { CommunityMember } from '../src/community-members/entities/community-mem
 import { prepareCommunityMembers } from './helpers/prepare-community-members';
 import { MemberRole } from '../src/community-members/enums/member-role.enum';
 
-describe('CommunitiesController (e2e)', () => {
+describe('CommunityMembersController (e2e)', () => {
   let app: NestExpressApplication;
   let usersRepo: Repository<User>;
   let communitiesRepo: Repository<Community>;

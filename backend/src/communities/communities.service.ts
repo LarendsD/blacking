@@ -4,6 +4,8 @@ import { UpdateCommunityDto } from './dto/update-community.dto';
 import { Community } from './entities/community.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CommunityMember } from '../community-members/entities/community-member.entity';
+import { MemberRole } from '../community-members/enums/member-role.enum';
 
 @Injectable()
 export class CommunitiesService {
@@ -21,17 +23,27 @@ export class CommunitiesService {
     );
 
     return this.communitiesService.manager.transaction(async (transaction) => {
-      return transaction.save(community);
-      // исплозьовать id для сохранения с базу участников в качестве админа
+      const createdCommunity = await transaction.save(community);
+
+      const communityMember = transaction.create(CommunityMember, {
+        communityId: createdCommunity.id,
+        memberId: userId,
+        memberRole: MemberRole.ADMIN,
+      });
+      await transaction.save(communityMember);
+
+      return createdCommunity;
     });
   }
 
   async findAll() {
-    return this.communitiesService.find();
+    return this.communitiesService.find({ relations: { members: true } });
   }
 
   async findOne(id: number) {
-    return this.communitiesService.findOne({ where: { id } });
+    return this.communitiesService.findOne({
+      where: { id },
+    });
   }
 
   async update(id: number, updateCommunityDto: UpdateCommunityDto) {
@@ -48,6 +60,10 @@ export class CommunitiesService {
   }
 
   async remove(id: number) {
-    return this.communitiesService.delete({ id });
+    return this.communitiesService.manager.transaction(async (transaction) => {
+      await transaction.delete(CommunityMember, { communityId: id });
+
+      await transaction.delete(Community, { id });
+    });
   }
 }

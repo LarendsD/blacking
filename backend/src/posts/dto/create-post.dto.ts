@@ -5,4 +5,8 @@ export class CreatePostDto extends ContentDto {
   @IsOptional()
   @IsNumber()
   repostedId: number;
+
+  @IsOptional()
+  @IsNumber()
+  communityId: number;
 }

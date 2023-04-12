@@ -1,10 +1,11 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { CaslAbilityFactory } from '../../casl/casl-ability.factory';
-import { CommunityMember } from '../entities/community-member.entity';
 import { PERMISSIONS_KEY } from '../../common/decorators/permissions.decorator';
-import { CommunityMembersService } from '../community-members.service';
+import { CommunityMembersService } from '../../community-members/community-members.service';
 import { Action } from 'backend/src/casl/action.enum';
+import { Post } from '../entities/post.entity';
+import { PostsService } from '../posts.service';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -12,6 +13,7 @@ export class RolesGuard implements CanActivate {
     private reflector: Reflector,
     private caslAbilityFactory: CaslAbilityFactory,
     private readonly communityMembersService: CommunityMembersService,
+    private readonly postsService: PostsService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -25,16 +27,42 @@ export class RolesGuard implements CanActivate {
 
     const { params, user, body } = context.switchToHttp().getRequest();
 
+    if (params.id) {
+      return this.checkById(params.id, user.id, requiredPermission);
+    }
+
+    const communityId = params.communityId ?? body.communityId;
+
+    if (communityId) {
+      return this.check(communityId, user.id, requiredPermission);
+    }
+
+    return true;
+  }
+
+  private async checkById(id: number, userId: number, action: Action) {
+    const post = await this.postsService.findOne(id);
+    if (!post.community) {
+      return true;
+    }
+
+    return this.check(post.communityId, userId, action);
+  }
+
+  private async check(communityId: number, userId: number, action: Action) {
     const communityMember =
-      await this.communityMembersService.findOneByCommunityId(params, user.id);
+      await this.communityMembersService.findOneByCommunityId(
+        { communityId },
+        userId,
+      );
+
+    if (!communityMember) {
+      return false;
+    }
 
     const ability =
       this.caslAbilityFactory.createForCommunityMember(communityMember);
 
-    const communityMemberBody = new CommunityMember();
-    communityMemberBody.memberRole = body.memberRole;
-
-    // TODO: Проверить защиту админа не быть забаненным модератором или банхаммером!!
-    return ability.can(requiredPermission, communityMemberBody);
+    return ability.can(action, Post);
   }
 }

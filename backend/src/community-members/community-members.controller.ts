@@ -13,7 +13,7 @@ import { CreateCommunityMemberDto } from './dto/create-community-member.dto';
 import { UpdateCommunityMemberDto } from './dto/update-community-member.dto';
 import { JwtAuthGuard } from '../session/guards/jwt-auth.guard';
 import { User } from '../users/user.decorator';
-import { Permissions } from './decorators/permissions.decorator';
+import { Permissions } from '../common/decorators/permissions.decorator';
 import { RolesGuard } from './guards/roles.guard';
 import { Action } from '../casl/action.enum';
 
