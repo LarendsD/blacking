@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { CommunitiesService } from './communities.service';
 import { CreateCommunityDto } from './dto/create-community.dto';
@@ -16,6 +17,7 @@ import { JwtAuthGuard } from '../session/guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { Permissions } from '../common/decorators/permissions.decorator';
 import { Action } from '../casl/action.enum';
+import { SearchCommunitiesDto } from './dto/search-communities.dto';
 
 @Controller('communities')
 export class CommunitiesController {
@@ -33,6 +35,11 @@ export class CommunitiesController {
   @Get()
   findAll() {
     return this.communitiesService.findAll();
+  }
+
+  @Get('search')
+  async searchCommunities(@Query() searchQuery: SearchCommunitiesDto) {
+    return this.communitiesService.search(searchQuery);
   }
 
   @Get(':id')

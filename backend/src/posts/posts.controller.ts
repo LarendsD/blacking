@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -16,6 +17,7 @@ import { JwtAuthGuard } from '../session/guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { Permissions } from '../common/decorators/permissions.decorator';
 import { Action } from '../casl/action.enum';
+import { SearchDto } from '../common/dto/search.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -40,11 +42,22 @@ export class PostsController {
     return this.postsService.findOne(id);
   }
 
+  @Get('author/:authorId')
+  async findByAuthorId(
+    @Query() searchQuery: SearchDto,
+    @Param('authorId') authorId: number,
+  ) {
+    return this.postsService.findByAuthorId(authorId, searchQuery);
+  }
+
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Permissions(Action.Read)
   @Get('community/:communityId')
-  findByCommunityId(@Param('communityId') communityId: number) {
-    return this.postsService.findByCommunityId(communityId);
+  async findByCommunityId(
+    @Query() searchQuery: SearchDto,
+    @Param('communityId') communityId: number,
+  ) {
+    return this.postsService.findByCommunityId(communityId, searchQuery);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

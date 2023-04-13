@@ -2,10 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { CreateCommunityDto } from './dto/create-community.dto';
 import { UpdateCommunityDto } from './dto/update-community.dto';
 import { Community } from './entities/community.entity';
-import { Repository } from 'typeorm';
+import { ArrayContains, ILike, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommunityMember } from '../community-members/entities/community-member.entity';
 import { MemberRole } from '../community-members/enums/member-role.enum';
+import { SearchCommunitiesDto } from './dto/search-communities.dto';
 
 @Injectable()
 export class CommunitiesService {
@@ -43,6 +44,20 @@ export class CommunitiesService {
   async findOne(id: number) {
     return this.communitiesService.findOne({
       where: { id },
+    });
+  }
+
+  async search(searchQuery: SearchCommunitiesDto) {
+    return this.communitiesService.find({
+      where: {
+        name: ILike(`%${searchQuery.searchLine}%`),
+        textContent: ILike(`%${searchQuery}%`),
+        communityType: ArrayContains(searchQuery.communityType),
+      },
+      take: 6 * Number(searchQuery.resultMultiplyer),
+      order: {
+        createdAt: searchQuery.sortByCreated,
+      },
     });
   }
 

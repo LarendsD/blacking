@@ -3,7 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { CaslAbilityFactory } from '../../casl/casl-ability.factory';
 import { PERMISSIONS_KEY } from '../../common/decorators/permissions.decorator';
 import { CommunityMembersService } from '../../community-members/community-members.service';
-import { Action } from 'backend/src/casl/action.enum';
+import { Action } from '../../casl/action.enum';
 import { Post } from '../entities/post.entity';
 import { PostsService } from '../posts.service';
 
@@ -42,8 +42,8 @@ export class RolesGuard implements CanActivate {
 
   private async checkById(id: number, userId: number, action: Action) {
     const post = await this.postsService.findOne(id);
-    if (!post.community) {
-      return true;
+    if (!post.communityId) {
+      return post.authorId === userId; // TODO: Проверить эту строку и может ли модератор или постер в сообществе удалить пост от другого модера или постера
     }
 
     return this.check(post.communityId, userId, action);

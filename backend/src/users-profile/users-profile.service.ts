@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ArrayContains, ILike, Raw, Repository } from 'typeorm';
 import { CreateUserProfileDto } from './dto/create-user-profile.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { UserProfile } from './entities/user-profile.entity';
+import { SearchUserProfileDto } from './dto/search-user-profile.dto';
 
 @Injectable()
 export class UsersProfileService {
@@ -28,6 +29,37 @@ export class UsersProfileService {
 
   async findById(id: number) {
     return this.usersProfileRepository.findOneBy({ id });
+  }
+
+  async search(searchQuery: SearchUserProfileDto): Promise<UserProfile[]> {
+    return this.usersProfileRepository.find({
+      where: {
+        firstName: ILike(`${searchQuery.searchLine}%`),
+        lastName: ILike(`${searchQuery.searchLine}%`),
+        middleName: ILike(`${searchQuery.searchLine}%`),
+        gender: searchQuery.gender,
+        birthday: Raw(
+          (alias) =>
+            `EXTRACT(YEAR FROM INTERVAL AGE(NOW(), ${alias})) BETWEEN :startAge AND :endAge`,
+          {
+            startAge: searchQuery.startAge ?? null,
+            endAge: searchQuery.endAge ?? null,
+          },
+        ),
+        countryCity: searchQuery.countryCity,
+        education: searchQuery.education,
+        educationType: searchQuery.educationType,
+        itDirection: searchQuery.itDirection,
+        itLangs: ArrayContains(searchQuery.itLangs),
+        itFrameworks: ArrayContains(searchQuery.itFrameworks),
+        itDatabases: ArrayContains(searchQuery.itDatabases),
+        itOtherInstruments: ArrayContains(searchQuery.itOtherInstruments),
+      },
+      take: 6 * Number(searchQuery.resultMultiplyer),
+      order: {
+        birthday: searchQuery.ageSort,
+      },
+    });
   }
 
   async update(id: number, updateUserProfileDto: UpdateUserProfileDto) {

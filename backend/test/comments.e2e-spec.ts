@@ -16,19 +16,27 @@ import { prepareUsers } from './helpers/prepare-users';
 import { preparePosts } from './helpers/prepare-posts';
 import { prepareComments } from './helpers/prepare-comments';
 import { prepareJwtToken } from './helpers/prepare-jwt-token';
+import { CommunityMember } from '../src/community-members/entities/community-member.entity';
+import { Community } from '../src/communities/entities/community.entity';
+import { prepareCommunityMembers } from './helpers/prepare-community-members';
+import { prepareCommunities } from './helpers/prepare-communities';
 
 describe('CommentsController (e2e)', () => {
   let app: NestExpressApplication;
   let usersRepo: Repository<User>;
   let postsRepo: Repository<Post>;
+  let communityMembersRepo: Repository<CommunityMember>;
+  let communityRepo: Repository<Community>;
   let commentsRepo: Repository<Comment>;
   let users: Array<Record<string, unknown>>;
   let contents: Array<Record<string, unknown>>;
+  let communities: Array<Record<string, unknown>>;
   let testData: Record<string, any>;
   let moduleFixture: TestingModule;
   let userData: User[];
   let postsData: Post[];
   let commentsData: Comment[];
+  let communityData: Community[];
   let jwtService: JwtService;
   let token: string;
   let dataSource: DataSource;
@@ -46,6 +54,9 @@ describe('CommentsController (e2e)', () => {
     contents = JSON.parse(
       fs.readFileSync(`${__dirname}/__fixtures__/contents.json`, 'utf-8'),
     );
+    communities = JSON.parse(
+      fs.readFileSync(`${__dirname}/__fixtures__/communities.json`, 'utf-8'),
+    );
     testData = JSON.parse(
       fs.readFileSync(`${__dirname}/__fixtures__/testData.json`, 'utf-8'),
     ).contents;
@@ -55,6 +66,8 @@ describe('CommentsController (e2e)', () => {
     usersRepo = dataSource.getRepository(User);
     postsRepo = dataSource.getRepository(Post);
     commentsRepo = dataSource.getRepository(Comment);
+    communityRepo = dataSource.getRepository(Community);
+    communityMembersRepo = dataSource.getRepository(CommunityMember);
 
     app.useGlobalPipes(new ValidationPipe());
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
@@ -64,7 +77,18 @@ describe('CommentsController (e2e)', () => {
 
   beforeEach(async () => {
     userData = await prepareUsers(usersRepo, users);
-    postsData = await preparePosts(postsRepo, contents, userData);
+    communityData = await prepareCommunities(communityRepo, communities);
+    await prepareCommunityMembers(
+      communityMembersRepo,
+      communityData,
+      userData,
+    );
+    postsData = await preparePosts(
+      postsRepo,
+      contents,
+      userData,
+      communityData,
+    );
 
     commentsData = await prepareComments(
       commentsRepo,
@@ -159,6 +183,8 @@ describe('CommentsController (e2e)', () => {
   afterEach(async () => {
     await dataSource.query(`DELETE FROM comments`);
     await dataSource.query(`DELETE FROM posts`);
+    await dataSource.query(`DELETE FROM community_members`);
+    await dataSource.query(`DELETE FROM communities`);
     return dataSource.query(`DELETE FROM users`);
   });
 

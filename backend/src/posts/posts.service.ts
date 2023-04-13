@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, IsNull, Repository } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post } from './entities/post.entity';
+import { SearchDto } from '../common/dto/search.dto';
 
 @Injectable()
 export class PostsService {
@@ -39,8 +40,25 @@ export class PostsService {
     });
   }
 
-  async findByCommunityId(communityId: number) {
-    return this.postsRepository.find({ where: { communityId } });
+  async findByAuthorId(authorId: number, searchQuery: SearchDto) {
+    return this.postsRepository.find({
+      where: {
+        textContent: ILike(`%${searchQuery.searchLine}%`),
+        communityId: IsNull(),
+        authorId,
+      },
+      take: 6 * Number(searchQuery.resultMultiplyer),
+    });
+  }
+
+  async findByCommunityId(communityId: number, searchQuery: SearchDto) {
+    return this.postsRepository.find({
+      where: {
+        textContent: ILike(`%${searchQuery.searchLine}%`),
+        communityId,
+      },
+      take: 6 * Number(searchQuery.resultMultiplyer),
+    });
   }
 
   async update(id: number, userId: number, updatePostDto: UpdatePostDto) {

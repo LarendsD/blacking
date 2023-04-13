@@ -14,17 +14,25 @@ import { Post } from '../src/posts/entities/post.entity';
 import { prepareUsers } from './helpers/prepare-users';
 import { preparePosts } from './helpers/prepare-posts';
 import { prepareJwtToken } from './helpers/prepare-jwt-token';
+import { prepareCommunityMembers } from './helpers/prepare-community-members';
+import { CommunityMember } from '../src/community-members/entities/community-member.entity';
+import { Community } from '../src/communities/entities/community.entity';
+import { prepareCommunities } from './helpers/prepare-communities';
 
 describe('PostsController (e2e)', () => {
   let app: NestExpressApplication;
   let usersRepo: Repository<User>;
   let postsRepo: Repository<Post>;
+  let communityMembersRepo: Repository<CommunityMember>;
+  let communityRepo: Repository<Community>;
   let users: Array<Record<string, unknown>>;
   let posts: Array<Record<string, unknown>>;
+  let communities: Array<Record<string, unknown>>;
   let testData: Record<string, any>;
   let moduleFixture: TestingModule;
   let userData: User[];
   let postsData: Post[];
+  let communityData: Community[];
   let jwtService: JwtService;
   let token: string;
   let dataSource: DataSource;
@@ -42,6 +50,9 @@ describe('PostsController (e2e)', () => {
     posts = JSON.parse(
       fs.readFileSync(`${__dirname}/__fixtures__/contents.json`, 'utf-8'),
     );
+    communities = JSON.parse(
+      fs.readFileSync(`${__dirname}/__fixtures__/communities.json`, 'utf-8'),
+    );
     testData = JSON.parse(
       fs.readFileSync(`${__dirname}/__fixtures__/testData.json`, 'utf-8'),
     ).contents;
@@ -50,6 +61,8 @@ describe('PostsController (e2e)', () => {
     dataSource = moduleFixture.get(getDataSourceToken());
     usersRepo = dataSource.getRepository(User);
     postsRepo = dataSource.getRepository(Post);
+    communityRepo = dataSource.getRepository(Community);
+    communityMembersRepo = dataSource.getRepository(CommunityMember);
 
     app.useGlobalPipes(new ValidationPipe());
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
@@ -59,7 +72,13 @@ describe('PostsController (e2e)', () => {
 
   beforeEach(async () => {
     userData = await prepareUsers(usersRepo, users);
-    postsData = await preparePosts(postsRepo, posts, userData);
+    communityData = await prepareCommunities(communityRepo, communities);
+    await prepareCommunityMembers(
+      communityMembersRepo,
+      communityData,
+      userData,
+    );
+    postsData = await preparePosts(postsRepo, posts, userData, communityData);
 
     token = prepareJwtToken(jwtService, userData[0]);
   });
@@ -70,7 +89,7 @@ describe('PostsController (e2e)', () => {
         .get('/posts')
         .expect(200);
 
-      expect(body).toHaveLength(4);
+      expect(body).toHaveLength(8);
     });
 
     it('get by id', async () => {
@@ -80,6 +99,43 @@ describe('PostsController (e2e)', () => {
         .expect(200);
 
       expect(body).toMatchObject(testData.read.output[1]);
+    });
+
+    it('get all(community)', async () => {
+      const { body } = await request(app.getHttpServer())
+        .get(`/posts/community/${communityData[1].id}`)
+        .query({ searchLine: '', resultMultiplyer: '1' })
+        .auth(token, { type: 'bearer' })
+        .expect(200);
+
+      const { createdAt, ...expectedBody } = postsData[5];
+
+      expect(body).toMatchObject([expectedBody]);
+    });
+
+    it('get all(community)(banned)', async () => {
+      return request(app.getHttpServer())
+        .get(`/posts/community/${communityData[2].id}`)
+        .auth(token, { type: 'bearer' })
+        .expect(403);
+    });
+
+    it('get by id(community)', async () => {
+      const { body } = await request(app.getHttpServer())
+        .get(`/posts/${postsData[5].id}`)
+        .auth(token, { type: 'bearer' })
+        .expect(200);
+
+      const { createdAt, ...expectedBody } = postsData[5];
+
+      expect(body).toMatchObject(expectedBody);
+    });
+
+    it('get by id(community)(banned)', async () => {
+      return request(app.getHttpServer())
+        .get(`/posts/${postsData[6].id}`)
+        .auth(token, { type: 'bearer' })
+        .expect(403);
     });
   });
 
@@ -103,6 +159,36 @@ describe('PostsController (e2e)', () => {
         ...testData.create.output,
       });
     });
+
+    it('in community(as poster)', async () => {
+      const { body } = await request(app.getHttpServer())
+        .post('/posts')
+        .auth(token, { type: 'bearer' })
+        .send({ communityId: communityData[4].id, ...testData.create.input })
+        .expect(201);
+
+      expect(body).toMatchObject({
+        communityId: communityData[4].id,
+        authorId: userData[0].id,
+        ...testData.create.output,
+      });
+    });
+
+    it('in community(as banned)', async () => {
+      await request(app.getHttpServer())
+        .post('/posts')
+        .auth(token, { type: 'bearer' })
+        .send({ communityId: communityData[2].id, ...testData.create.input })
+        .expect(403);
+    });
+
+    it('in community(as viewer)', async () => {
+      await request(app.getHttpServer())
+        .post('/posts')
+        .auth(token, { type: 'bearer' })
+        .send({ communityId: communityData[1].id, ...testData.create.input })
+        .expect(403);
+    });
   });
 
   describe('update post', () => {
@@ -121,6 +207,28 @@ describe('PostsController (e2e)', () => {
         .expect(200);
 
       expect(body).toMatchObject(testData.update.output);
+    });
+
+    it('in community(as poster)', async () => {
+      const { body } = await request(app.getHttpServer())
+        .patch(`/posts/${postsData[7].id}`)
+        .auth(token, { type: 'bearer' })
+        .send(testData.update.input)
+        .expect(200);
+
+      expect(body).toMatchObject({
+        communityId: communityData[4].id,
+        authorId: userData[0].id,
+        ...testData.update.output,
+      });
+    });
+
+    it('in community(as viewer)', async () => {
+      await request(app.getHttpServer())
+        .patch(`/posts/${postsData[5].id}`)
+        .auth(token, { type: 'bearer' })
+        .send(testData.update.input)
+        .expect(403);
     });
   });
 
@@ -143,10 +251,32 @@ describe('PostsController (e2e)', () => {
 
       expect(message).toBeNull();
     });
+
+    it('in community(as poster)', async () => {
+      await request(app.getHttpServer())
+        .delete(`/posts/${postsData[7].id}`)
+        .auth(token, { type: 'bearer' })
+        .expect(200);
+
+      const post = await postsRepo.findOne({
+        where: { id: postsData[7].id },
+      });
+
+      expect(post).toBeNull();
+    });
+
+    it('in community(as viewer)', async () => {
+      await request(app.getHttpServer())
+        .patch(`/posts/${postsData[5].id}`)
+        .auth(token, { type: 'bearer' })
+        .expect(403);
+    });
   });
 
   afterEach(async () => {
+    await dataSource.query(`DELETE FROM community_members`);
     await dataSource.query(`DELETE FROM posts`);
+    await dataSource.query(`DELETE FROM communities`);
     return dataSource.query(`DELETE FROM users`);
   });
 

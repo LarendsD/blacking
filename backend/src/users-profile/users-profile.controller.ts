@@ -7,11 +7,13 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { JwtPrivateProfileAuthGuard } from '../session/guards/jwt-private-profile-auth.guard';
 import { CreateUserProfileDto } from './dto/create-user-profile.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { UsersProfileService } from './users-profile.service';
+import { SearchUserProfileDto } from './dto/search-user-profile.dto';
 
 @Controller('users-profile')
 export class UsersProfileController {
@@ -23,6 +25,11 @@ export class UsersProfileController {
     createUserProfileDto: CreateUserProfileDto,
   ) {
     return this.usersProfileService.create(createUserProfileDto);
+  }
+
+  @Get('search')
+  async searchProfiles(@Query() searchQuery: SearchUserProfileDto) {
+    return this.usersProfileService.search(searchQuery);
   }
 
   @Get()
