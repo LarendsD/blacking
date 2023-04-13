@@ -45,5 +45,10 @@ export const prepareCommunityMembers = async (
       memberId: userData[0].id,
       memberRole: MemberRole.POSTER,
     },
+    {
+      communityId: communityData[5].id,
+      memberId: userData[0].id,
+      memberRole: MemberRole.MUTED,
+    },
   ]);
 };

@@ -138,6 +138,28 @@ describe('CommentsController (e2e)', () => {
         ...testData.create.output,
       });
     });
+
+    it('muted in community', async () => {
+      return request(app.getHttpServer())
+        .post(`/comments/${postsData[8].id}`)
+        .auth(token, { type: 'bearer' })
+        .send(testData.create.input)
+        .expect(403);
+    });
+
+    it('viewer in community', async () => {
+      const { body } = await request(app.getHttpServer())
+        .post(`/comments/${postsData[5].id}`)
+        .auth(token, { type: 'bearer' })
+        .send(testData.create.input)
+        .expect(201);
+
+      expect(body).toMatchObject({
+        authorId: userData[0].id,
+        postId: postsData[5].id,
+        ...testData.create.output,
+      });
+    });
   });
 
   describe('update comment', () => {

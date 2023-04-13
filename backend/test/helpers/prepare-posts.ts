@@ -46,5 +46,10 @@ export const preparePosts = async (
       communityId: communityData ? communityData[4].id : null,
       ...postData[0],
     },
+    {
+      authorId: userData[2].id,
+      communityId: communityData ? communityData[5].id : null,
+      ...postData[1],
+    },
   ]);
 };

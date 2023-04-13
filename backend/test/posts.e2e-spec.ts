@@ -89,7 +89,7 @@ describe('PostsController (e2e)', () => {
         .get('/posts')
         .expect(200);
 
-      expect(body).toHaveLength(8);
+      expect(body).toHaveLength(9);
     });
 
     it('get by id', async () => {

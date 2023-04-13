@@ -14,12 +14,16 @@ import { User } from '../users/user.decorator';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { RolesGuard } from './guards/roles.guard';
+import { Action } from '../casl/action.enum';
+import { Permissions } from '../common/decorators/permissions.decorator';
 
 @Controller('comments')
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Permissions(Action.Create)
   @Post(':postId')
   create(
     @Param('postId', ParseIntPipe) postId: number,
