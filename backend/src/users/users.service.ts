@@ -85,15 +85,17 @@ export class UsersService {
       recoverHash: recoverHash,
     });
 
-    setTimeout(async () => {
-      await this.usersRepository.update(currentUser.id, { recoverHash: null });
-    }, 900000);
-
     const url = `${frontendUrl}/recovery/${recoverHash}`;
 
     if (process.env.NODE_ENV !== 'production') {
       console.log(`This is your recovering url: ${url}`);
     } else {
+      setTimeout(async () => {
+        await this.usersRepository.update(currentUser.id, {
+          recoverHash: null,
+        });
+      }, 900000);
+
       this.mailerService.sendMail({
         to: email,
         from: 'noreply@runit.com',

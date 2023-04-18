@@ -13,8 +13,6 @@ import { JwtService } from '@nestjs/jwt';
 import { prepareUsers } from './helpers/prepare-users';
 import { prepareJwtToken } from './helpers/prepare-jwt-token';
 
-jest.useRealTimers();
-
 describe('UsersController (e2e)', () => {
   let app: NestExpressApplication;
   let usersRepo: Repository<User>;
