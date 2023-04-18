@@ -13,6 +13,8 @@ import { JwtService } from '@nestjs/jwt';
 import { prepareUsers } from './helpers/prepare-users';
 import { prepareJwtToken } from './helpers/prepare-jwt-token';
 
+jest.useRealTimers();
+
 describe('UsersController (e2e)', () => {
   let app: NestExpressApplication;
   let usersRepo: Repository<User>;
@@ -195,7 +197,7 @@ describe('UsersController (e2e)', () => {
 
     expect(Object.keys(body)).toEqual(['email', 'hash']);
 
-    return request(app.getHttpServer())
+    await request(app.getHttpServer())
       .get(`/users/recover/${body.hash}`)
       .expect(200)
       .expect({ id });
