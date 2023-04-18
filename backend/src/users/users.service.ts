@@ -98,7 +98,7 @@ export class UsersService {
 
       this.mailerService.sendMail({
         to: email,
-        from: 'noreply@runit.com',
+        from: 'noreply@blacking.com',
         subject: 'Ссылка для изменения пароля на Blacking',
         template: 'recover',
         context: {
