@@ -12,7 +12,7 @@ export default () => {
       return session({
         store: new RedisStore({ client: redisClient }),
         saveUninitialized: false,
-        secret: process.env.REDIS_SERCET,
+        secret: process.env.REDIS_SECRET,
         resave: false,
         cookie: {
           maxAge,
