@@ -5,7 +5,7 @@ export default (): MailerOptions => {
   switch (process.env.NODE_ENV) {
     case 'production':
       return {
-        transport: process.env.TRANSPORT_MAILER_URL,
+        transport: process.env.TRANSPORT_MAILER_URL ?? 'smtp://localhost:1025',
         defaults: {
           from: '"Blacking" <blacking@new.com>',
         },

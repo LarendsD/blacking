@@ -11,6 +11,7 @@ import { PostReaction } from '../../reactions/entities/post-reaction.entity';
 import { CommentReaction } from '../../reactions/entities/comment-reaction.entity';
 import { Community } from '../../communities/entities/community.entity';
 import { CommunityMember } from '../../community-members/entities/community-member.entity';
+import { migrations1681808084618 } from '../migrations/1681808084618-migrations';
 
 export default async (): Promise<DataSource> => {
   config();
@@ -19,13 +20,13 @@ export default async (): Promise<DataSource> => {
     case 'production':
       return new DataSource({
         type: 'postgres',
-        username: process.env.DATABASE_USERNAME,
-        password: process.env.DATABASE_PASSWORD,
+        username: process.env.DATABASE_USERNAME || 'postgres',
+        password: process.env.DATABASE_PASSWORD || 'postgres',
         port: Number(process.env.DATABASE_PORT),
         url: process.env.DATABASE_URL,
         ssl: { rejectUnauthorized: false },
         entities: [`${__dirname}/entities/*.entity.{ts,js}`],
-        migrations: [],
+        migrations: [migrations1681808084618],
       });
 
     case 'test':
