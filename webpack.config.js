@@ -8,7 +8,7 @@ const env = process.env.NODE_ENV ?? 'development';
 module.exports = [
   {
     mode: env,
-    entry: './frontend/app/app.js',
+    entry: './frontend/index.js',
     output: {
       publicPath: '/',
       path: path.resolve(__dirname, 'dist'),

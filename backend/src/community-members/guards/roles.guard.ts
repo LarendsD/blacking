@@ -4,7 +4,7 @@ import { CaslAbilityFactory } from '../../casl/casl-ability.factory';
 import { CommunityMember } from '../entities/community-member.entity';
 import { PERMISSIONS_KEY } from '../../common/decorators/permissions.decorator';
 import { CommunityMembersService } from '../community-members.service';
-import { Action } from 'backend/src/casl/action.enum';
+import { Action } from '../../casl/action.enum';
 
 @Injectable()
 export class RolesGuard implements CanActivate {

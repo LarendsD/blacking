@@ -27,6 +27,7 @@ export class CaslAbilityFactory {
     const { can, cannot, build } = new AbilityBuilder<
       MongoAbility<[Action, Subjects]>
     >(createMongoAbility);
+
     can(Action.Read, CommunityMember);
     can(Action.Read, Post);
     can(Action.Read, Community);

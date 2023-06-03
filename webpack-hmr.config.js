@@ -16,6 +16,7 @@ module.exports = [
     externals: [
       nodeExternals({
         allowlist: ['webpack/hot/poll?100'],
+        modulesDir: './backend/node_modules'
       }),
     ],
     plugins: [
@@ -35,16 +36,16 @@ module.exports = [
       ],
     },
     output: {
-      path: path.join(__dirname, 'backend/dist'),
+      path: path.join(__dirname, './backend/dist'),
       filename: 'server.js',
       assetModuleFilename: 'assets/[hash][ext][query]',
     },
   },
   {
     mode: env,
-    entry: './frontend/app/app.js',
+    entry: './frontend/index.js',
     plugins: [
-      new HtmlWebpackPlugin({ template: './frontend/app/public/index.html' }),
+      new HtmlWebpackPlugin({ template: './frontend/index.html' }),
       new webpack.HotModuleReplacementPlugin(),
       new MiniCssExtractPlugin({ filename: 'css/[name].[contenthash].css' }),
     ],

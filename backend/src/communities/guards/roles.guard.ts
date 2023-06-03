@@ -3,7 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { CaslAbilityFactory } from '../../casl/casl-ability.factory';
 import { PERMISSIONS_KEY } from '../../common/decorators/permissions.decorator';
 import { CommunityMembersService } from '../../community-members/community-members.service';
-import { Action } from 'backend/src/casl/action.enum';
+import { Action } from '../../casl/action.enum';
 import { Community } from '../entities/community.entity';
 
 @Injectable()

@@ -1,10 +1,8 @@
 env:
-  browser: true
   es2021: true
   node: true
   jest: true
 extends:
-  - plugin:react/recommended
   - plugin:@typescript-eslint/recommended
   - plugin:prettier/recommended
 root: true
@@ -14,9 +12,8 @@ parserOptions:
   ecmaVersion: latest
   sourceType: module
   project: 'tsconfig.json'
-  tsconfigRootDir : './'
+  tsconfigRootDir : './backend'
 plugins:
-  - react
   - '@typescript-eslint/eslint-plugin'
 rules: {
   '@typescript-eslint/interface-name-prefix': 'off',
